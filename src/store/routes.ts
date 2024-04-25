@@ -2,8 +2,6 @@
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import type { RouteItem } from 'vue-router';
-// import { asyncRoutes, basicRoutes } from "@/router/routes/index" //改成外部传入
-// import { envEnum } from "@/utils/enums"
 import type { AppRouteModule } from "@/utils/types";
 
 /**

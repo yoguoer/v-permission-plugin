@@ -1,8 +1,6 @@
 
 import type { Router, RouteItem } from 'vue-router';
 import { getToken, getOAToken } from "@/utils/token";
-// import { whiteList } from '@/router' //改成外部传入的自定义白名单
-import { ElMessage } from "element-plus";
 import { routesStoreWithOut } from "@/store/routes";
 import { useUserStoreWithOut } from "@/store/user";
 import type { AppRouteModule } from "@/utils/types";
@@ -17,7 +15,8 @@ export function createPermissionGuard(
     basicRoutes: AppRouteModule[],
     getAuthList: Function,
     checkOaLogin: Function,
-    domain: string
+    domain: string,
+    Message: Function
 ) {
     /**
      * 问题： 直接使用 router.beforeEach 会导致在刷新页面时无法进入 router.beforeEach 的回调函数
@@ -29,7 +28,7 @@ export function createPermissionGuard(
 
         router.beforeEach(async (to, from, next) => {
             if (getToken()) {
-                return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain)
+                return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message)
             } else {
                 // 获取 oa 中的 token
                 const { oaToken } = getOAToken(domain)
@@ -69,7 +68,8 @@ export async function routerPermission(
     asyncRoutes: AppRouteModule[],
     basicRoutes: AppRouteModule[],
     getAuthList: Function,
-    domain: string
+    domain: string,
+    Message: Function
 ) {
 
     // 已经存在 token, 进入用户登录页面
@@ -86,10 +86,14 @@ export async function routerPermission(
         if (canAccess) {
             return next()
         } else {
-            ElMessage({
-                message: "您没有权限访问页面,请联系系统管理员!",
-                type: "warning",
-            });
+            if (Message) {
+                Message({
+                    message: "您没有权限访问页面,请联系系统管理员!",
+                    type: "warning",
+                });
+            } else {
+                alert("您没有权限访问页面,请联系系统管理员!")
+            }
             return false
         }
     }

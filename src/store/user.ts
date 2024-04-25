@@ -78,6 +78,9 @@ export const useUserStore = defineStore({
     // 获取用户权限列表
     async GetAuthority(getAuthList: Function, domain: string): Promise<T> {
       try {
+        if(typeof getAuthList !== "function") {
+          return Error("getAuthList 参数错误")
+        }
         const data = await getAuthList()
         const leftMenuNames: Array<T> = []
         // 递归获取后端路由 name 的数组存入 leftMenuNames
@@ -96,6 +99,9 @@ export const useUserStore = defineStore({
       const { key, oaToken } = getOAToken(domain);
       if (!oaToken) return false;
       try {
+        if(typeof checkOaLogin !== "function") {
+          return Error("checkOaLogin 参数错误")
+        }
         const data = await checkOaLogin({
           ticketName: key,
           ticketValue: oaToken
