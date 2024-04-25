@@ -1,5 +1,5 @@
 {
-  "name": "permission",
+  "name": "vivien-permission",
   "version": "1.0.0",
   "description": "vue3路由权限插件",
   "main": "index.js",
@@ -12,7 +12,6 @@
   "dependencies": {
     "element-plus": "^2.7.1",
     "eslint": "^9.1.1",
-    "js-cookie": "^3.0.5",
     "typescript": "^5.4.5",
     "vite": "^5.2.10"
   },
@@ -22,6 +21,7 @@
   },
   "peerDependencies": {
     "pinia": "^2.1.7",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.3.2",
+    "js-cookie": "^3.0.5"
   }
 }

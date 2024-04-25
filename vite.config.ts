@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       // 确保外部化依赖，这样它们不会被打包进你的库中  
-      external: ['pinia','vue-router']
+      external: ['pinia','vue-router','js-cookie']
     },
     // 产物输出目录，默认值就是 dist。我们使用默认值
     outDir: 'dist',
