@@ -16,6 +16,7 @@ export function createPermissionGuard(
     asyncRoutes: AppRouteModule[],
     basicRoutes: AppRouteModule[],
     getAuthList: Function,
+    checkOaLogin: Function,
     domain: string
 ) {
     /**
@@ -36,7 +37,7 @@ export function createPermissionGuard(
                 if (oaToken) { // oa 存在 token，用户已经登录 oa
                     try {
                         // 使用 oa token 登录系统
-                        await userStore.CheckOaLogin(domain);
+                        await userStore.CheckOaLogin(checkOaLogin, domain);
 
                         return next();
                     } catch (err) {

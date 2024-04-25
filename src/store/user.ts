@@ -1,6 +1,5 @@
 import Storage from "@/utils/storage";
 import { defineStore } from "pinia";
-import { checkOaLogin } from "@/api/common/user";
 import { store } from "@/store";
 import { getToken, setToken, removeToken, getOAToken } from "@/utils/token";
 import { getChildValue } from "@/utils/index"
@@ -93,7 +92,7 @@ export const useUserStore = defineStore({
     },
 
     // 使用 oa token 登录系统
-    async CheckOaLogin(domain: string) {
+    async CheckOaLogin(checkOaLogin: Function, domain: string) {
       const { key, oaToken } = getOAToken(domain);
       if (!oaToken) return false;
       try {
