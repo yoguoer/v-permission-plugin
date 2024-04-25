@@ -1,6 +1,6 @@
 
 import type { Router, RouteItem } from 'vue-router';
-import { getToken, getOAToken, getOALoginToken } from "@/utils/token";
+import { getToken, getOAToken } from "@/utils/token";
 // import { whiteList } from '@/router' //改成外部传入的自定义白名单
 import { ElMessage } from "element-plus";
 import { routesStoreWithOut } from "@/store/routes";
@@ -10,12 +10,13 @@ import type { AppRouteModule } from "@/utils/types";
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut()
 
-
 export function createPermissionGuard(
     router: Router,
     whiteList: string[],
     asyncRoutes: AppRouteModule[],
-    basicRoutes: AppRouteModule[]
+    basicRoutes: AppRouteModule[],
+    getAuthList: Function,
+    domain: string
 ) {
     /**
      * 问题： 直接使用 router.beforeEach 会导致在刷新页面时无法进入 router.beforeEach 的回调函数
@@ -27,20 +28,19 @@ export function createPermissionGuard(
 
         router.beforeEach(async (to, from, next) => {
             if (getToken()) {
-                return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes)
+                return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain)
             } else {
                 // 获取 oa 中的 token
-                const { oaToken } = getOAToken()
+                const { oaToken } = getOAToken(domain)
 
                 if (oaToken) { // oa 存在 token，用户已经登录 oa
                     try {
                         // 使用 oa token 登录系统
-                        await userStore.CheckOaLogin();
-                        // 获取新 oa token:LtpaToken, 通过创建 iframe,重定向获取 oa 登录 token
-                        await getOALoginToken()
+                        await userStore.CheckOaLogin(domain);
+
                         return next();
                     } catch (err) {
-                        userStore.ClearLocal();
+                        userStore.ClearLocal(domain);
                         return next("/login?redirect=" + to.path);
 
                     }
@@ -64,9 +64,11 @@ export async function routerPermission(
     to: RouteItem,
     from: RouteItem,
     next: Function,
-    whiteList: String[],
+    whiteList: string[],
     asyncRoutes: AppRouteModule[],
-    basicRoutes: AppRouteModule[]
+    basicRoutes: AppRouteModule[],
+    getAuthList: Function,
+    domain: string
 ) {
 
     // 已经存在 token, 进入用户登录页面
@@ -79,7 +81,7 @@ export async function routerPermission(
             return next(from.path);
         }
     } else {
-        const canAccess = await canUserAccess(to, whiteList, asyncRoutes, basicRoutes)
+        const canAccess = await canUserAccess(to, whiteList, asyncRoutes, basicRoutes, getAuthList, domain)
         if (canAccess) {
             return next()
         } else {
@@ -103,21 +105,23 @@ export async function routerPermission(
 */
 export async function canUserAccess(
     to: RouteItem,
-    whiteList: String[],
+    whiteList: string[],
     asyncRoutes: AppRouteModule[],
-    basicRoutes: AppRouteModule[]
+    basicRoutes: AppRouteModule[],
+    getAuthList: Function,
+    domain: string
 ) {
     if (!to || to?.name === "Login") return false
     try {
         let accessRoutes = userStore.getAuthority || {}
         if (accessRoutes?.menuNames && accessRoutes?.menuNames?.length === 0) {
-            accessRoutes = await userStore.GetAuthority()
+            accessRoutes = await userStore.GetAuthority(getAuthList, domain)
             routeStore.GenerateRoutes(accessRoutes?.menuNames || [], asyncRoutes, basicRoutes)
         }
         const allRoutes = [...whiteList, ...accessRoutes?.menuNames]
         return allRoutes.length > 0 && allRoutes.includes(to.name)
     } catch (err) {
-        userStore.Logout()
+        userStore.Logout(domain)
         return false
     }
 

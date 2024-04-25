@@ -1,14 +1,9 @@
 import Storage from "@/utils/storage";
 import { defineStore } from "pinia";
-import { checkOaLogin, getAuthList } from "@/api/common/user";
+import { checkOaLogin } from "@/api/common/user";
 import { store } from "@/store";
 import { getToken, setToken, removeToken, getOAToken } from "@/utils/token";
 import { getChildValue } from "@/utils/index"
-
-interface LoginParams {
-  username: string | undefined;
-  password: string | undefined;
-}
 
 export interface authorityType {
   menu: Array<T>, // 菜单权限
@@ -38,21 +33,21 @@ interface UserState {
 export const useUserStore = defineStore({
   id: "user-store",
 
-  state: (): 
-   => ({
-    authority: {
-      menu: [], // 菜单权限
-      menuNames: [],  // 菜单权限名称列表
-      rule: [], // 按钮级别权限
-    },
-    // token
-    token: undefined,
-    expire: undefined,
-    oa: {
-      ticketName: null,
-      ticketValue: null
-    }
-  }),
+  state: ():
+    UserState => ({
+      authority: {
+        menu: [], // 菜单权限
+        menuNames: [],  // 菜单权限名称列表
+        rule: [], // 按钮级别权限
+      },
+      // token
+      token: undefined,
+      expire: undefined,
+      oa: {
+        ticketName: null,
+        ticketValue: null
+      }
+    }),
 
   getters: {
     getToken(): string {
@@ -82,11 +77,9 @@ export const useUserStore = defineStore({
     },
 
     // 获取用户权限列表
-    async GetAuthority(): Promise<T> {
+    async GetAuthority(getAuthList: Function, domain: string): Promise<T> {
       try {
-        const data = await getAuthList({
-          type: 3
-        })
+        const data = await getAuthList()
         const leftMenuNames: Array<T> = []
         // 递归获取后端路由 name 的数组存入 leftMenuNames
         getChildValue(data?.menu || [], leftMenuNames, 'name', 'children')
@@ -94,14 +87,14 @@ export const useUserStore = defineStore({
         this.SetAuthority(data);
         return data
       } catch (error) {
-        this.ClearLocal();
+        this.ClearLocal(domain);
         return null;
       }
     },
 
     // 使用 oa token 登录系统
-    async CheckOaLogin() {
-      const { key, oaToken } = getOAToken();
+    async CheckOaLogin(domain: string) {
+      const { key, oaToken } = getOAToken(domain);
       if (!oaToken) return false;
       try {
         const data = await checkOaLogin({
@@ -110,24 +103,24 @@ export const useUserStore = defineStore({
         })
         return data;
       } catch (error) {
-        this.Logout();
+        this.Logout(domain);
       }
     },
 
     // 退出
-    async Logout() {
+    async Logout(domain: string) {
       try {
       } catch (error) {
         console.error(error);
       } finally {
-        this.ClearLocal();
+        this.ClearLocal(domain);
         location.hash = '/login'
       }
     },
 
     //清空存储数据
-    ClearLocal() {
-      removeToken();
+    ClearLocal(domain: string) {
+      removeToken(domain);
       Storage.clearLocalStorage();
       Storage.clearSessioStorage();
       Storage.clearCookies();

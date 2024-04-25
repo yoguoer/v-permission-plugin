@@ -1,6 +1,5 @@
 import Storage from "@/utils/storage";
-import { LoginEnum, envEnum, TOKEN_KEY, OA_TOKEN_KEYS, OA_LOGIN_TOKEN } from "@/utils/enums"
-import { createIframe, destroyIframe } from '@/utils/index'
+import { TOKEN_KEY, OA_TOKEN_KEYS } from "@/utils/enums"
 
 // oa 中单点登录使用 token 可能存在两个 key 值，需要循环使用两个 key 获取 cookies 中的 token
 // 旧 OA 使用 SIAMJWT, 新 OA 使用 SIAMTGT 和 LtpaToken
@@ -17,17 +16,17 @@ interface tokenInfoType {
  * 设置 Token 信息
  * @param {*} param
  */
-export function setTokenInfo({ token, expire, key, ticketName, ticketValue }: tokenInfoType): viod {
+export function setTokenInfo({ token, expire, key, ticketName, ticketValue }: tokenInfoType, domain: string): viod {
   Storage.setCookies(TOKEN_KEY, token)
-  return setOAToken(ticketName, ticketValue)
+  return setOAToken(ticketName, ticketValue, domain)
 }
 
 /**
  * 移除 Token 信息
  */
-export function removeAuthToken() {
-  removeToken()
-  removeOAToken()
+export function removeAuthToken(domain: string) {
+  removeToken(domain)
+  removeOAToken(domain)
 }
 
 /**
@@ -53,8 +52,8 @@ export function setToken(token: string | null | undefined) {
  * 移除 Token
  * @returns
  */
-export function removeToken() {
-  removeOAToken()
+export function removeToken(domain: string) {
+  removeOAToken(domain)
   return Storage.removeCookies(TOKEN_KEY)
 }
 
@@ -66,13 +65,13 @@ interface oaTokensType {
  * 获取 Token, 由于 OA 使用三个 token，因此需要遍历获取 token
  * @returns
  */
-export function getOAToken(): oaTokensType {
+export function getOAToken(domain: string): oaTokensType {
   let key = null
   let oaToken = null
 
   for (const keys of OA_TOKEN_KEYS) {
     oaToken = Storage.getCookies(keys, {
-      domain: '.tcl.com'
+      domain: domain
     })
     if (oaToken) {
       key = keys
@@ -92,44 +91,21 @@ export function getOAToken(): oaTokensType {
  * @param {*} token
  * @returns
  */
-export function setOAToken(tokenKey: string, token: string) {
+export function setOAToken(tokenKey: string, token: string, domain: string) {
   return Storage.setCookies(tokenKey, token, {
     expires: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
-    domain: '.tcl.com'
+    domain: domain
   })
 }
 
 /**
  * 清空所有 oa token
  */
-export function removeOAToken() {
+export function removeOAToken(domain: string) {
   OA_TOKEN_KEYS.forEach((key: string) =>
     Storage.removeCookies(key, {
-      domain: '.tcl.com'
+      domain: domain
     })
   )
 }
 
-/**
- * 获取新 oa token:LtpaToken, 通过创建 iframe,重定向获取 oa 登录 token
- */
-export function getOALoginToken() {
-  // 存在 token 或 开发环境下不获取
-  const { oaToken } = getOAToken()
-  if (
-    getToken(OA_LOGIN_TOKEN) ||
-    !oaToken ||
-    process.env.NODE_ENV === envEnum.DEVELOPMENT
-  ) { return }
-  const dom = document.body
-  const iframe: Element = createIframe({
-    dom,
-    onload: () =>
-      setTimeout(() => {
-        destroyIframe(iframe)
-      }, 500),
-    src: LoginEnum.OaUrl,
-    hidden: true,
-    onerror: destroyIframe(iframe)
-  })
-}
