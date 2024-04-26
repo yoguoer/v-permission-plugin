@@ -75,6 +75,7 @@ pnpm install vivien-permission
 ### 引入vivien-perimission
 
 在你的项目中直接引入 XW-UI 的 vivien-perimission 插件
+下面是一个例子，展示了最简单的用法
 
 ```javascript
 import { createApp } from 'vue'
@@ -95,7 +96,7 @@ app.use(router)
 const domain = '.tcl.com'
 const publicPath = import.meta.env.VITE_PUBLIC_PATH
 //定义一个符合 permissionOptions 接口的对象 
-const options ={
+const options = {
   publicPath, // 历史记录路径
   router,  // 路由对象（可选）
   whiteList, // 白名单
