@@ -1,23 +1,45 @@
-import type { Router } from 'vue-router';
-import { createPermissionGuard } from './permissionGuard';
+import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
+import type { App } from "vue";
 import type { AppRouteModule } from "@/utils/types";
 
-// 定义一个接口来描述函数需要的参数对象  
-interface PermissionGuardOptions {
-    router: Router;  //路由对象
-    whiteList: string[]; //白名单
-    asyncRoutes: AppRouteModule[]; //异步路由
-    basicRoutes: AppRouteModule[]; //基础路由
-    getAuthList: Function, // 获取用户权限列表
-    checkOaLogin: Function, // 检查oa登录状态
-    domain: string, // oa 域名
-    Message: Function, // 消息提示
+// 创建一个可以被 Vue 应用程序使用的路由实例
+export function toCreateRouter(
+  historyPath: string, // 历史记录路径
+  asyncRoutes: AppRouteModule[], // 异步路由
+  basicRoutes: AppRouteModule[] // 基础路由
+  ) {
+    return createRouter({
+      // 创建一个 hash 历史记录。
+      history: createWebHashHistory(historyPath),
+      // 应该添加到路由的初始路由列表。
+      routes: [...asyncRoutes, ...basicRoutes] as unknown as RouteRecordRaw[],
+      // 是否应该禁止尾部斜杠。默认为假
+      strict: false,
+      scrollBehavior: () => ({ left: 0, top: 0 }),
+    });
 }
 
-// 使用接口作为函数参数的类型 
-export function setupRouterGuard(options: PermissionGuardOptions) {
-    // 在函数体内，可以通过 options 对象来访问传入的参数  
-    const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-    // 使用参数
-    createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message)
+// 定义一个接口来描述函数需要的参数对象  
+export interface setupRouterOptions {
+  app: App<Element>,
+  historyPath: string,
+  asyncRoutes: AppRouteModule[], // 异步路由
+  basicRoutes: AppRouteModule[] // 基础路由
 }
+
+// config router
+// 配置路由器
+export function setupRouter(rOptions: setupRouterOptions) {
+  const { app, historyPath, asyncRoutes, basicRoutes } = rOptions;
+  let router = app.$router; // 尝试从应用实例上获取路由器
+  if (!router) {
+    // 如果没有设置router，则创建并使用它  
+    router = toCreateRouter(historyPath, asyncRoutes, basicRoutes);  
+    app.use(router);  
+  } else {
+    // 已经设置路由  
+    console.log('router has already been set up.');  
+  }
+  return router; // 无论app.$router是否存在，都会返回路由实例
+}
+

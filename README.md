@@ -77,31 +77,36 @@ pnpm install vivien-permission
 在你的项目中直接引入 XW-UI 的 vivien-perimission 插件
 
 ```javascript
-import { vivienPermission } from "xw-ui/vivien-permission";
+import { createApp } from 'vue';  
+import App from './App.vue';  
+import bootstrap from "xw-ui/vivien-permission";
 import { whiteList, asyncRoutes, basicRoutes } from "@/router/setRoutes"
 import { getAuthList, checkOaLogin } from "@/api/login"
+import router from './path-to-route'; // 假设这是你的router实例  
+//  创建一个Vue应用实例
+const app = createApp(App);  
 
 const domain = '.tcl.com'
-
-// 初始化路由
-const initRoute = async (app: any) => {
-  await import("@/router").then(async (router: any) => {
-    // 配置路由
-    router.setupRouter(app);
-    const guard = vivienPermission
-    const options ={     
-      router, //路由对象
-      whiteList, //白名单
-      asyncRoutes,//异步路由
-      basicRoutes,//基础路由
-      getAuthList, // 获取用户权限列表
-      checkOaLogin, // 检查oa登录状态
-      domain, // oa 域名
-      ElMessage, // 消息提示
-    }
-    // 路由守卫
-    guard.setupRouterGuard(options);
-  });
+const historyPath = import.meta.env.VITE_PUBLIC_PATH
+//定义一个符合 permissionOptions 接口的对象 
+const options ={
+  historyPath, // 历史记录路径
+  router,  // 路由对象（可选）
+  whiteList, // 白名单
+  asyncRoutes, // 异步路由
+  basicRoutes, // 基础路由
+  getAuthList, // 获取用户权限列表
+  checkOaLogin, // 检查oa登录状态
+  domain, // oa 域名
+  ElMessage, // 消息提示
 }
+
+// 执行 bootstrap 函数  
+bootstrap(app, options).then(() => {  
+  app.mount('#app'); // 挂载 Vue 应用  
+}).catch((error) => {  
+  console.error('Bootstrap failed:', error);  
+});
+
 ```
 
