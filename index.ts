@@ -22,7 +22,6 @@ const initStore = async (app: any) => {
   });
 }
 
-
 async function initPermission(app: any, options: permissionOptions) {
   await initStore(app);
   await initRoute(app, options);
