@@ -5,8 +5,8 @@ import type { AppRouteModule } from "@/utils/types";
 const initRoute = async (app: any, options: permissionOptions) => {
   const { historyPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
   const rOptions = { app, historyPath, asyncRoutes, basicRoutes }
-  const pOptions = { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message }
   await import("@/router").then(async (router: any) => {
+    const pOptions = { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message }
     // 配置路由
     router.setupRouter(rOptions);
     const guard = await import("@/router/guard");
