@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import type { RouteItem } from 'vue-router';
-import type { AppRouteModule } from "@/utils/types";
+import type { AppRouteModule } from "@/types/router";
 
 /**
  * Filter asynchronous routing tables by recursion

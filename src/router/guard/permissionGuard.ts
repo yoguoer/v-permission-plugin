@@ -3,7 +3,7 @@ import type { Router, RouteItem } from 'vue-router';
 import { getToken, getOAToken } from "@/utils/token";
 import { routesStoreWithOut } from "@/store/routes";
 import { useUserStoreWithOut } from "@/store/user";
-import type { AppRouteModule } from "@/utils/types";
+import type { AppRouteModule } from "@/types/router";
 
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut()

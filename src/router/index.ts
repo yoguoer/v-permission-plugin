@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
-import type { App } from "vue";
-import type { AppRouteModule } from "@/utils/types";
+import type { AppRouteModule } from "@/types/router";
+import type { setupRouterOptions } from "@/types/store";
 
 // 创建一个可以被 Vue 应用程序使用的路由实例
 export function toCreateRouter(
@@ -20,12 +20,7 @@ export function toCreateRouter(
 }
 
 // 定义一个接口来描述函数需要的参数对象  
-export interface setupRouterOptions {
-  app: App<Element>,
-  historyPath: string,
-  asyncRoutes: AppRouteModule[], // 异步路由
-  basicRoutes: AppRouteModule[] // 基础路由
-}
+
 
 // config router
 // 配置路由器

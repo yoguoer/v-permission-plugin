@@ -1,5 +1,4 @@
-import type { Router } from 'vue-router';
-import type { AppRouteModule } from "@/utils/types";
+import type { permissionOptions } from "@/types/store";
 
 // 初始化路由
 const initRoute = async (app: any, options: permissionOptions) => {
@@ -23,17 +22,7 @@ const initStore = async (app: any) => {
   });
 }
 
-export interface permissionOptions {
-  historyPath: string,
-  router?: Router,  // 路由对象
-  whiteList: string[], // 白名单
-  asyncRoutes: AppRouteModule[], // 异步路由
-  basicRoutes: AppRouteModule[], // 基础路由
-  getAuthList: Function, // 获取用户权限列表
-  checkOaLogin: Function, // 检查oa登录状态
-  domain: string, // oa 域名
-  Message: Function, // 消息提示
-}
+
 async function bootstrap(app: any, options: permissionOptions) {
   await initStore(app);
   await initRoute(app, options);
