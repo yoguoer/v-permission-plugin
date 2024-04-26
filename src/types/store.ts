@@ -15,13 +15,13 @@ export interface PermissionGuardOptions {
 
 export interface setupRouterOptions {
     app: App<Element>,
-    historyPath: string,
+    publicPath: string,
     asyncRoutes: AppRouteModule[], // 异步路由
     basicRoutes: AppRouteModule[] // 基础路由
 }
 
 export interface permissionOptions {
-    historyPath: string,
+    publicPath: string,
     router?: Router,  // 路由对象
     whiteList: string[], // 白名单
     asyncRoutes: AppRouteModule[], // 异步路由

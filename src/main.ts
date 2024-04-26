@@ -2,8 +2,8 @@ import type { permissionOptions } from "@/types/store";
 
 // 初始化路由
 const initRoute = async (app: any, options: permissionOptions) => {
-  const { historyPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-  const rOptions = { app, historyPath, asyncRoutes, basicRoutes }
+  const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
+  const rOptions = { app, publicPath, asyncRoutes, basicRoutes }
   await import("@/router").then(async (router: any) => {
     const pOptions = { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message }
     // 配置路由
@@ -23,9 +23,9 @@ const initStore = async (app: any) => {
 }
 
 
-async function bootstrap(app: any, options: permissionOptions) {
+async function initPermission(app: any, options: permissionOptions) {
   await initStore(app);
   await initRoute(app, options);
 }
 
-export default bootstrap
+export default initPermission

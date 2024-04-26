@@ -77,20 +77,26 @@ pnpm install vivien-permission
 在你的项目中直接引入 XW-UI 的 vivien-perimission 插件
 
 ```javascript
-import { createApp } from 'vue';  
-import App from './App.vue';  
-import bootstrap from "xw-ui/vivien-permission";
-import { whiteList, asyncRoutes, basicRoutes } from "@/router/setRoutes"
-import { getAuthList, checkOaLogin } from "@/api/login"
-import router from './path-to-route'; // 假设这是你的router实例  
-//  创建一个Vue应用实例
-const app = createApp(App);  
+import { createApp } from 'vue'
+import App from './views/App.vue'
+import { createPinia } from 'pinia'
+import bootstrap from "vivien-permission"
+import { whiteList, asyncRoutes, basicRoutes } from "这是你的接口路由配置"
+import { getAuthList, checkOaLogin } from "这是你的接口"
+import router from '这是你的router实例';  
+import ElMessage from '这是你的消息提示';  
+
+const app = createApp(App);
+const pinia = createPinia()
+
+app.use(router)
+.use(pinia)
 
 const domain = '.tcl.com'
-const historyPath = import.meta.env.VITE_PUBLIC_PATH
+const publicPath = import.meta.env.VITE_PUBLIC_PATH
 //定义一个符合 permissionOptions 接口的对象 
 const options ={
-  historyPath, // 历史记录路径
+  publicPath, // 历史记录路径
   router,  // 路由对象（可选）
   whiteList, // 白名单
   asyncRoutes, // 异步路由
@@ -98,15 +104,12 @@ const options ={
   getAuthList, // 获取用户权限列表
   checkOaLogin, // 检查oa登录状态
   domain, // oa 域名
-  ElMessage, // 消息提示
+  ElMessage // 消息提示
 }
 
-// 执行 bootstrap 函数  
-bootstrap(app, options).then(() => {  
-  app.mount('#app'); // 挂载 Vue 应用  
-}).catch((error) => {  
-  console.error('Bootstrap failed:', error);  
-});
+await bootstrap(app, options)
+
+app.mount('#app')
 
 ```
 
