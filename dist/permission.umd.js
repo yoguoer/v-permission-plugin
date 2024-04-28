@@ -416,7 +416,7 @@
   }
   const routeStore = routesStoreWithOut();
   const userStore = useUserStoreWithOut();
-  function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
+  async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
     router.isReady().then(() => {
       router.beforeEach(async (to, from, next) => {
         if (getToken()) {
@@ -481,7 +481,7 @@
       return false;
     }
   }
-  function setupRouterGuard(pOptions) {
+  async function setupRouterGuard(pOptions) {
     const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
     createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
   }

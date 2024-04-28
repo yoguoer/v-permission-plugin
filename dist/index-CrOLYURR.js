@@ -1,6 +1,8 @@
-import Cookies from "js-cookie";
-import { defineStore } from "pinia";
-import { store } from "./index-DPhoIAbk.mjs";
+"use strict";
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const Cookies = require("js-cookie");
+const pinia = require("pinia");
+const index = require("./index-DKjqm6ao.js");
 const _Storage = class _Storage {
   /**
    * 获取 Cookies
@@ -172,7 +174,7 @@ function filterRoutes(routesInstans, routesMenuNames) {
     }
   }
 }
-const useRoutesStore = defineStore({
+const useRoutesStore = pinia.defineStore({
   id: "routes-store",
   state: () => ({
     routes: [],
@@ -248,9 +250,9 @@ const useRoutesStore = defineStore({
   }
 });
 function routesStoreWithOut() {
-  return useRoutesStore(store);
+  return useRoutesStore(index.store);
 }
-const useUserStore = defineStore({
+const useUserStore = pinia.defineStore({
   id: "user-store",
   state: () => ({
     authority: {
@@ -351,11 +353,11 @@ const useUserStore = defineStore({
   }
 });
 function useUserStoreWithOut() {
-  return useUserStore(store);
+  return useUserStore(index.store);
 }
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
-function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
+async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
   router.isReady().then(() => {
     router.beforeEach(async (to, from, next) => {
       if (getToken()) {
@@ -420,10 +422,8 @@ async function canUserAccess(to, whiteList, asyncRoutes, basicRoutes, getAuthLis
     return false;
   }
 }
-function setupRouterGuard(pOptions) {
+async function setupRouterGuard(pOptions) {
   const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
   createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
 }
-export {
-  setupRouterGuard
-};
+exports.setupRouterGuard = setupRouterGuard;

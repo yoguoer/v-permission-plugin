@@ -1,8 +1,6 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const Cookies = require("js-cookie");
-const pinia = require("pinia");
-const index = require("./index-DKjqm6ao.js");
+import Cookies from "js-cookie";
+import { defineStore } from "pinia";
+import { store } from "./index-DPhoIAbk.mjs";
 const _Storage = class _Storage {
   /**
    * 获取 Cookies
@@ -174,7 +172,7 @@ function filterRoutes(routesInstans, routesMenuNames) {
     }
   }
 }
-const useRoutesStore = pinia.defineStore({
+const useRoutesStore = defineStore({
   id: "routes-store",
   state: () => ({
     routes: [],
@@ -250,9 +248,9 @@ const useRoutesStore = pinia.defineStore({
   }
 });
 function routesStoreWithOut() {
-  return useRoutesStore(index.store);
+  return useRoutesStore(store);
 }
-const useUserStore = pinia.defineStore({
+const useUserStore = defineStore({
   id: "user-store",
   state: () => ({
     authority: {
@@ -353,11 +351,11 @@ const useUserStore = pinia.defineStore({
   }
 });
 function useUserStoreWithOut() {
-  return useUserStore(index.store);
+  return useUserStore(store);
 }
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
-function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
+async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
   router.isReady().then(() => {
     router.beforeEach(async (to, from, next) => {
       if (getToken()) {
@@ -422,8 +420,10 @@ async function canUserAccess(to, whiteList, asyncRoutes, basicRoutes, getAuthLis
     return false;
   }
 }
-function setupRouterGuard(pOptions) {
+async function setupRouterGuard(pOptions) {
   const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
   createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
 }
-exports.setupRouterGuard = setupRouterGuard;
+export {
+  setupRouterGuard
+};

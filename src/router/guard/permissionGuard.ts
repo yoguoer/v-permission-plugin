@@ -8,7 +8,7 @@ import type { AppRouteModule } from "@/types/router";
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut()
 
-export function createPermissionGuard(
+export async function createPermissionGuard(
     router: Router,
     whiteList: string[],
     asyncRoutes: AppRouteModule[],
