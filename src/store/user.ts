@@ -2,10 +2,8 @@ import Storage from "@/utils/storage";
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import { getToken, setToken, removeToken, getOAToken } from "@/utils/token";
-import { getChildValue } from "@/utils/index"
 
 export interface authorityType {
-  menu: Array<T>, // 菜单权限
   menuNames: Array<T>, // 菜单权限名称列表
   rule: Array<T>,// 按钮级别权限
 }
@@ -35,7 +33,6 @@ export const useUserStore = defineStore({
   state: ():
     UserState => ({
       authority: {
-        menu: [], // 菜单权限
         menuNames: [],  // 菜单权限名称列表
         rule: [], // 按钮级别权限
       },
@@ -81,13 +78,15 @@ export const useUserStore = defineStore({
         if(typeof getAuthList !== "function") {
           return Error("getAuthList 参数错误")
         }
+        const authority: authorityType =  {
+          menuNames:[], // 菜单权限名称列表
+          rule: [],// 按钮级别权限
+        }
         const data = await getAuthList()
-        const leftMenuNames: Array<T> = []
-        // 递归获取后端路由 name 的数组存入 leftMenuNames
-        getChildValue(data?.menu || [], leftMenuNames, 'name', 'children')
-        data.menuNames = leftMenuNames
-        this.SetAuthority(data);
-        return data
+        authority.menuNames = data.menuNames
+        authority.rule = data.rule
+        this.SetAuthority(authority);
+        return authority
       } catch (error) {
         this.ClearLocal(domain);
         return null;

@@ -311,22 +311,10 @@
   function routesStoreWithOut() {
     return useRoutesStore(store);
   }
-  function getChildValue(data = [], arr = [], key = "", children = "children") {
-    if (!key || data.length <= 0)
-      return;
-    data.forEach((item) => {
-      if (item[children]) {
-        getChildValue(item.children, arr, key, children);
-      }
-      arr.push(item[key]);
-    });
-  }
   const useUserStore = pinia.defineStore({
     id: "user-store",
     state: () => ({
       authority: {
-        menu: [],
-        // 菜单权限
         menuNames: [],
         // 菜单权限名称列表
         rule: []
@@ -370,12 +358,17 @@
           if (typeof getAuthList !== "function") {
             return Error("getAuthList 参数错误");
           }
+          const authority = {
+            menuNames: [],
+            // 菜单权限名称列表
+            rule: []
+            // 按钮级别权限
+          };
           const data = await getAuthList();
-          const leftMenuNames = [];
-          getChildValue((data == null ? void 0 : data.menu) || [], leftMenuNames, "name", "children");
-          data.menuNames = leftMenuNames;
-          this.SetAuthority(data);
-          return data;
+          authority.menuNames = data.menuNames;
+          authority.rule = data.rule;
+          this.SetAuthority(authority);
+          return authority;
         } catch (error) {
           this.ClearLocal(domain);
           return null;
