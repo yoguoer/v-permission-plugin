@@ -4,11 +4,11 @@
   "use strict";
   const initRoute = async (app, options) => {
     const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-    const rOptions = { app, publicPath, asyncRoutes, basicRoutes };
-    await Promise.resolve().then(() => index$2).then(async (router2) => {
-      const pOptions = { router: router2, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
-      router2.setupRouter(rOptions);
+    const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
+    return await Promise.resolve().then(() => index$2).then(async (routerMethod) => {
+      const routeInstance = routerMethod.setupRouter(rOptions);
       const guard = await Promise.resolve().then(() => index);
+      const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
       guard.setupRouterGuard(pOptions);
     });
   };
@@ -29,20 +29,17 @@
       routes: [...asyncRoutes, ...basicRoutes]
     });
   }
-  function hasRouteraBeenSetup(app) {
-    return app.config.globalProperties.$router !== void 0;
-  }
   function setupRouter(rOptions) {
-    const { app, publicPath, asyncRoutes, basicRoutes } = rOptions;
-    let router;
-    if (!hasRouteraBeenSetup(app)) {
-      router = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
-      app.use(router);
+    const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
+    let route;
+    if (!router) {
+      route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
+      app.use(route);
     } else {
-      router = app.$router;
+      route = router;
       console.log("router has already been set up.");
     }
-    return router;
+    return route;
   }
   const index$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,

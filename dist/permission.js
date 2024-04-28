@@ -1,11 +1,11 @@
 "use strict";
 const initRoute = async (app, options) => {
   const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-  const rOptions = { app, publicPath, asyncRoutes, basicRoutes };
-  await Promise.resolve().then(() => require("./index-CmUL6ArP.js")).then(async (router2) => {
-    const pOptions = { router: router2, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
-    router2.setupRouter(rOptions);
+  const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
+  return await Promise.resolve().then(() => require("./index-7vmBGxb5.js")).then(async (routerMethod) => {
+    const routeInstance = routerMethod.setupRouter(rOptions);
     const guard = await Promise.resolve().then(() => require("./index-B-vpgglp.js"));
+    const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
     guard.setupRouterGuard(pOptions);
   });
 };

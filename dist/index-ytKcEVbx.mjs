@@ -7,20 +7,17 @@ function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
     routes: [...asyncRoutes, ...basicRoutes]
   });
 }
-function hasRouteraBeenSetup(app) {
-  return app.config.globalProperties.$router !== void 0;
-}
 function setupRouter(rOptions) {
-  const { app, publicPath, asyncRoutes, basicRoutes } = rOptions;
-  let router;
-  if (!hasRouteraBeenSetup(app)) {
-    router = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
-    app.use(router);
+  const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
+  let route;
+  if (!router) {
+    route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
+    app.use(route);
   } else {
-    router = app.$router;
+    route = router;
     console.log("router has already been set up.");
   }
-  return router;
+  return route;
 }
 export {
   setupRouter,
