@@ -3,13 +3,13 @@ import type { permissionOptions } from "@/types/store";
 // 初始化路由
 const initRoute = async (app: any, options: permissionOptions) => {
   const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-  const rOptions = { app, publicPath, asyncRoutes, basicRoutes }
-  await import("@/router").then(async (router: any) => {
-    const pOptions = { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message }
-    // 配置路由
-    router.setupRouter(rOptions);
+  const rOptions = { app,router, publicPath, asyncRoutes, basicRoutes }
+  return await import("@/router").then(async (routerMethod: any) => {
+    // 创建路由实例
+    const routeInstance  = routerMethod.setupRouter(rOptions);
     const guard = await import("@/router/guard");
     // 路由守卫
+    const pOptions = { router:routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message }
     guard.setupRouterGuard(pOptions);
   });
 }

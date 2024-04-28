@@ -15,6 +15,7 @@ export interface PermissionGuardOptions {
 
 export interface setupRouterOptions {
     app: App<Element>,
+    router: Router,
     publicPath: string,
     asyncRoutes: AppRouteModule[], // 异步路由
     basicRoutes: AppRouteModule[] // 基础路由

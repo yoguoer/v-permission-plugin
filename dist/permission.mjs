@@ -1,7 +1,7 @@
 const initRoute = async (app, options) => {
   const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
   const rOptions = { app, publicPath, asyncRoutes, basicRoutes };
-  await import("./index-CovLNo3m.mjs").then(async (router2) => {
+  await import("./index-CBmSYMv2.mjs").then(async (router2) => {
     const pOptions = { router: router2, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
     router2.setupRouter(rOptions);
     const guard = await import("./index-S7g4wDj-.mjs");

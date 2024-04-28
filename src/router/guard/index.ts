@@ -1,8 +1,6 @@
 import { createPermissionGuard } from '@/router/guard/permissionGuard';
 import type { PermissionGuardOptions } from "@/types/store";
 
-// 定义一个接口来描述函数需要的参数对象  
-
 
 // 使用接口作为函数参数的类型 
 export function setupRouterGuard(pOptions: PermissionGuardOptions) {
