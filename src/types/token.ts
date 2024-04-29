@@ -15,7 +15,7 @@ export interface TokenKeyOptions {
     user_async_route_key?: string
 }
 
-export interface StorageOptionsType {
+export interface StorageOptions {
     type: 'localStorage' | 'sessionStorage' | 'cookie',
     expires?: number | undefined
 }

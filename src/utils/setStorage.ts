@@ -1,10 +1,10 @@
-import type { StorageOptionsType } from "@/types/token";
+import type { StorageOptions } from "@/types/token";
 
-const storageOptions: StorageOptionsType = {
+const storageOptions: StorageOptions = {
     type: "cookie",
     expires: undefined
 };
-export function setStorage(options: StorageOptionsType) {
+export function setStorage(options: StorageOptions) {
     const { type, expires } = options
     if (type) storageOptions.type = type
     if (expires) storageOptions.expires = expires

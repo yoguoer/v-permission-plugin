@@ -132,3 +132,7 @@ export async function canUserAccess(
 
 }
 
+// 暴露获取后台管理路由的方法
+export function getPermissionRoutes(asyncRoutes: AppRouteModule[]){
+    return routeStore.getAdminRoutes(asyncRoutes || [])
+}

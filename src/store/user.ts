@@ -2,6 +2,7 @@ import Storage from "@/utils/storage";
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import { getToken, setToken, removeToken, getOAToken } from "@/utils/token";
+import storageOptions from "@/utils/setStorage";
 
 export interface authorityType {
   menuNames: Array<T>, // 菜单权限名称列表
@@ -64,7 +65,9 @@ export const useUserStore = defineStore({
       this.oa = oa;
       setToken(token);
       if (oa.ticketName) {
-        Storage.setCookies(oa.ticketName, oa.ticketValue);
+        const { type } = storageOptions
+        const storage = new Storage(type);
+        storage.setItem(oa.ticketName, oa.ticketValue);
       }
     },
 
@@ -125,9 +128,7 @@ export const useUserStore = defineStore({
     //清空存储数据
     ClearLocal(domain: string) {
       removeToken(domain);
-      Storage.clearLocalStorage();
-      Storage.clearSessioStorage();
-      Storage.clearCookies();
+      Storage.clearAll();
     },
   },
 });

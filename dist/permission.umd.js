@@ -18,87 +18,6 @@
     data.menuNames = menuNames;
     return data;
   }
-  const tokenkeys = {
-    TOKEN_KEY: "_TOKEN__",
-    OA_TOKEN_KEYS: ["SIAMTGT", "SIAMJWT"],
-    LOCALE_KEY: "_LOCALE__",
-    USER_INFO_KEY: "_USER__INFO__",
-    USER_AUTHORITY_KEY: "_USER__AUTHORITY__",
-    USER_ASYNC_ROUTE_KEY: "_USER_ASYNC_ROUTE_"
-  };
-  function setKeys(keyOptions) {
-    if (keyOptions.token_key)
-      tokenkeys.TOKEN_KEY = keyOptions.token_key;
-    if (keyOptions.oa_token_keys)
-      tokenkeys.OA_TOKEN_KEYS = keyOptions.oa_token_keys;
-    if (keyOptions.locale_key)
-      tokenkeys.LOCALE_KEY = keyOptions.locale_key;
-    if (keyOptions.user_info_key)
-      tokenkeys.USER_INFO_KEY = keyOptions.user_info_key;
-    if (keyOptions.user_authority_key)
-      tokenkeys.USER_AUTHORITY_KEY = keyOptions.user_authority_key;
-    if (keyOptions.user_async_route_key) {
-      tokenkeys.USER_ASYNC_ROUTE_KEY = keyOptions.user_async_route_key;
-    }
-  }
-  const storageOptions = {
-    type: "cookie",
-    expires: void 0
-  };
-  function setStorage(options) {
-    const { type, expires } = options;
-    if (type)
-      storageOptions.type = type;
-    if (expires)
-      storageOptions.expires = expires;
-  }
-  const initRoute = async (app, options) => {
-    const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-    const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
-    return await Promise.resolve().then(() => index$2).then(async (routerMethod) => {
-      const routeInstance = routerMethod.setupRouter(rOptions);
-      const guard = await Promise.resolve().then(() => index);
-      const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
-      guard.setupRouterGuard(pOptions);
-    });
-  };
-  const initStore = async (app) => {
-    await Promise.resolve().then(() => index$1).then(async (store2) => {
-      await store2.setupStore(app);
-    });
-  };
-  async function initPermission(app, options) {
-    await initStore(app);
-    await initRoute(app, options);
-  }
-  function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
-    return vueRouter.createRouter({
-      // 创建一个 hash 历史记录。
-      history: vueRouter.createWebHashHistory(publicPath),
-      // 应该添加到路由的初始路由列表。
-      routes: [...asyncRoutes, ...basicRoutes]
-    });
-  }
-  function hasRouteraBeenSetup(app) {
-    return app.config.globalProperties.$router !== void 0;
-  }
-  function setupRouter(rOptions) {
-    const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
-    let route;
-    if (!router && !hasRouteraBeenSetup(app)) {
-      route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
-      app.use(route);
-    } else {
-      route = router || app.config.globalProperties.$router;
-      console.log("router has already been set up.");
-    }
-    return route;
-  }
-  const index$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-    __proto__: null,
-    setupRouter,
-    toCreateRouter
-  }, Symbol.toStringTag, { value: "Module" }));
   class Storage {
     constructor(type) {
       this.getSessionStorage = (k) => {
@@ -258,6 +177,52 @@
           throw new Error("Invalid storage type");
       }
     }
+    // 清除所有
+    static clearAll() {
+      window.localStorage.clear();
+      window.sessionStorage.clear();
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      }
+    }
+  }
+  const tokenkeys = {
+    TOKEN_KEY: "_TOKEN__",
+    OA_TOKEN_KEYS: ["SIAMTGT", "SIAMJWT"],
+    LOCALE_KEY: "_LOCALE__",
+    USER_INFO_KEY: "_USER__INFO__",
+    USER_AUTHORITY_KEY: "_USER__AUTHORITY__",
+    USER_ASYNC_ROUTE_KEY: "_USER_ASYNC_ROUTE_"
+  };
+  function setKeys(keyOptions) {
+    if (keyOptions.token_key)
+      tokenkeys.TOKEN_KEY = keyOptions.token_key;
+    if (keyOptions.oa_token_keys)
+      tokenkeys.OA_TOKEN_KEYS = keyOptions.oa_token_keys;
+    if (keyOptions.locale_key)
+      tokenkeys.LOCALE_KEY = keyOptions.locale_key;
+    if (keyOptions.user_info_key)
+      tokenkeys.USER_INFO_KEY = keyOptions.user_info_key;
+    if (keyOptions.user_authority_key)
+      tokenkeys.USER_AUTHORITY_KEY = keyOptions.user_authority_key;
+    if (keyOptions.user_async_route_key) {
+      tokenkeys.USER_ASYNC_ROUTE_KEY = keyOptions.user_async_route_key;
+    }
+  }
+  const storageOptions = {
+    type: "cookie",
+    expires: void 0
+  };
+  function setStorage(options) {
+    const { type, expires } = options;
+    if (type)
+      storageOptions.type = type;
+    if (expires)
+      storageOptions.expires = expires;
   }
   function getToken(key) {
     const setKey = key || tokenkeys.TOKEN_KEY;
@@ -315,7 +280,7 @@
       console.log("Pinia has already been set up.");
     }
   }
-  const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  const index$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     setupStore,
     store
@@ -449,7 +414,9 @@
         this.oa = oa;
         setToken(token);
         if (oa.ticketName) {
-          Storage.setCookies(oa.ticketName, oa.ticketValue);
+          const { type } = storageOptions;
+          const storage = new Storage(type);
+          storage.setItem(oa.ticketName, oa.ticketValue);
         }
       },
       SetAuthority(authority) {
@@ -508,9 +475,7 @@
       //清空存储数据
       ClearLocal(domain) {
         removeToken(domain);
-        Storage.clearLocalStorage();
-        Storage.clearSessioStorage();
-        Storage.clearCookies();
+        Storage.clearAll();
       }
     }
   });
@@ -584,6 +549,56 @@
       return false;
     }
   }
+  function getPermissionRoutes(asyncRoutes) {
+    return routeStore.getAdminRoutes(asyncRoutes || []);
+  }
+  const initRoute = async (app, options) => {
+    const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
+    const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
+    return await Promise.resolve().then(() => index$1).then(async (routerMethod) => {
+      const routeInstance = routerMethod.setupRouter(rOptions);
+      const guard = await Promise.resolve().then(() => index);
+      const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
+      guard.setupRouterGuard(pOptions);
+    });
+  };
+  const initStore = async (app) => {
+    await Promise.resolve().then(() => index$2).then(async (store2) => {
+      await store2.setupStore(app);
+    });
+  };
+  async function initPermission(app, options) {
+    await initStore(app);
+    await initRoute(app, options);
+  }
+  function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
+    return vueRouter.createRouter({
+      // 创建一个 hash 历史记录。
+      history: vueRouter.createWebHashHistory(publicPath),
+      // 应该添加到路由的初始路由列表。
+      routes: [...asyncRoutes, ...basicRoutes]
+    });
+  }
+  function hasRouteraBeenSetup(app) {
+    return app.config.globalProperties.$router !== void 0;
+  }
+  function setupRouter(rOptions) {
+    const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
+    let route;
+    if (!router && !hasRouteraBeenSetup(app)) {
+      route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
+      app.use(route);
+    } else {
+      route = router || app.config.globalProperties.$router;
+      console.log("router has already been set up.");
+    }
+    return route;
+  }
+  const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+    __proto__: null,
+    setupRouter,
+    toCreateRouter
+  }, Symbol.toStringTag, { value: "Module" }));
   async function setupRouterGuard(pOptions) {
     const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
     createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
@@ -592,8 +607,12 @@
     __proto__: null,
     setupRouterGuard
   }, Symbol.toStringTag, { value: "Module" }));
+  exports2.canUserAccess = canUserAccess;
+  exports2.createPermissionGuard = createPermissionGuard;
   exports2.default = initPermission;
+  exports2.getPermissionRoutes = getPermissionRoutes;
   exports2.getRouteNames = getRouteNames;
+  exports2.routerPermission = routerPermission;
   exports2.setKeys = setKeys;
   exports2.setStorage = setStorage;
   exports2.storageOptions = storageOptions;
