@@ -3,7 +3,7 @@ import type { permissionOptions } from "@/types/store";
 // 初始化路由
 const initRoute = async (app: any, options: permissionOptions) => {
   const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-  const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes }
+  const rOptions = { app,router, publicPath, asyncRoutes, basicRoutes }
   return await import("@/router").then(async (routerMethod: any) => {
     // 创建路由实例
     const routeInstance  = routerMethod.setupRouter(rOptions);
@@ -27,4 +27,8 @@ async function initPermission(app: any, options: permissionOptions) {
   await initRoute(app, options);
 }
 
-export default initPermission
+export default initPermission;
+
+
+export  { getRouteNames } from '@/utils/getRouteNames'; //暴露处理菜单名称列表的方法
+export  { default as tokenkeys, setKeys }  from '@/utils/tokenKey'; //暴露设置key的方法

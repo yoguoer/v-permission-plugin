@@ -1,6 +1,6 @@
-import { getChildValue } from "@/utils/index"
+import { getChildValue } from "@/utils/index";
 
-export default function getRouteNames(data){
+export function getRouteNames(data){
     let menuNames: Array<T> = []
      // 递归获取后端路由 name 的数组存入 leftMenuNames
      getChildValue(data?.menu || [], menuNames, 'name', 'children')

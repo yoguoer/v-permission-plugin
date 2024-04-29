@@ -1,5 +1,5 @@
 import Storage from "@/utils/storage";
-import { TOKEN_KEY, OA_TOKEN_KEYS } from "@/utils/enums"
+import tokenkeys from "@/utils/tokenKey";
 
 // oa 中单点登录使用 token 可能存在两个 key 值，需要循环使用两个 key 获取 cookies 中的 token
 // 旧 OA 使用 SIAMJWT, 新 OA 使用 SIAMTGT 和 LtpaToken
@@ -17,7 +17,7 @@ interface tokenInfoType {
  * @param {*} param
  */
 export function setTokenInfo({ token, expire, key, ticketName, ticketValue }: tokenInfoType, domain: string): viod {
-  Storage.setCookies(TOKEN_KEY, token)
+  Storage.setCookies(tokenkeys.TOKEN_KEY, token)
   return setOAToken(ticketName, ticketValue, domain)
 }
 
@@ -35,7 +35,7 @@ export function removeAuthToken(domain: string) {
  * @returns
  */
 export function getToken(key?: string | undefined): string {
-  const setKey = key || TOKEN_KEY
+  const setKey = key || tokenkeys.TOKEN_KEY
   return Storage.getCookies(setKey) as string
 }
 
@@ -45,7 +45,7 @@ export function getToken(key?: string | undefined): string {
  * @returns
  */
 export function setToken(token: string | null | undefined) {
-  return Storage.setCookies(TOKEN_KEY, token)
+  return Storage.setCookies(tokenkeys.TOKEN_KEY, token)
 }
 
 /**
@@ -54,7 +54,7 @@ export function setToken(token: string | null | undefined) {
  */
 export function removeToken(domain: string) {
   removeOAToken(domain)
-  return Storage.removeCookies(TOKEN_KEY)
+  return Storage.removeCookies(tokenkeys.TOKEN_KEY)
 }
 
 interface oaTokensType {
@@ -69,7 +69,7 @@ export function getOAToken(domain: string): oaTokensType {
   let key = null
   let oaToken = null
 
-  for (const keys of OA_TOKEN_KEYS) {
+  for (const keys of tokenkeys.OA_TOKEN_KEYS) {
     oaToken = Storage.getCookies(keys, {
       domain: domain
     })
@@ -102,7 +102,7 @@ export function setOAToken(tokenKey: string, token: string, domain: string) {
  * 清空所有 oa token
  */
 export function removeOAToken(domain: string) {
-  OA_TOKEN_KEYS.forEach((key: string) =>
+  tokenkeys.OA_TOKEN_KEYS.forEach((key: string) =>
     Storage.removeCookies(key, {
       domain: domain
     })

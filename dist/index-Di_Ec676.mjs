@@ -1,8 +1,7 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const Cookies = require("js-cookie");
-const pinia = require("pinia");
-const index = require("./index-DKjqm6ao.js");
+import Cookies from "js-cookie";
+import { tokenkeys } from "./permission.mjs";
+import { defineStore } from "pinia";
+import { store } from "./index-DPhoIAbk.mjs";
 const _Storage = class _Storage {
   /**
    * 获取 Cookies
@@ -126,23 +125,21 @@ _Storage.getSessionStorage = (k) => {
   }
 };
 let Storage = _Storage;
-const TOKEN_KEY = "PMP_TOKEN__";
-const OA_TOKEN_KEYS = ["SIAMTGT", "SIAMJWT"];
 function getToken(key) {
-  const setKey = key || TOKEN_KEY;
+  const setKey = key || tokenkeys.TOKEN_KEY;
   return Storage.getCookies(setKey);
 }
 function setToken(token) {
-  return Storage.setCookies(TOKEN_KEY, token);
+  return Storage.setCookies(tokenkeys.TOKEN_KEY, token);
 }
 function removeToken(domain) {
   removeOAToken(domain);
-  return Storage.removeCookies(TOKEN_KEY);
+  return Storage.removeCookies(tokenkeys.TOKEN_KEY);
 }
 function getOAToken(domain) {
   let key = null;
   let oaToken = null;
-  for (const keys of OA_TOKEN_KEYS) {
+  for (const keys of tokenkeys.OA_TOKEN_KEYS) {
     oaToken = Storage.getCookies(keys, {
       domain
     });
@@ -157,7 +154,7 @@ function getOAToken(domain) {
   };
 }
 function removeOAToken(domain) {
-  OA_TOKEN_KEYS.forEach(
+  tokenkeys.OA_TOKEN_KEYS.forEach(
     (key) => Storage.removeCookies(key, {
       domain
     })
@@ -174,7 +171,7 @@ function filterRoutes(routesInstans, routesMenuNames) {
     }
   }
 }
-const useRoutesStore = pinia.defineStore({
+const useRoutesStore = defineStore({
   id: "routes-store",
   state: () => ({
     routes: [],
@@ -250,9 +247,9 @@ const useRoutesStore = pinia.defineStore({
   }
 });
 function routesStoreWithOut() {
-  return useRoutesStore(index.store);
+  return useRoutesStore(store);
 }
-const useUserStore = pinia.defineStore({
+const useUserStore = defineStore({
   id: "user-store",
   state: () => ({
     authority: {
@@ -353,7 +350,7 @@ const useUserStore = pinia.defineStore({
   }
 });
 function useUserStoreWithOut() {
-  return useUserStore(index.store);
+  return useUserStore(store);
 }
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
@@ -426,4 +423,6 @@ async function setupRouterGuard(pOptions) {
   const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
   createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
 }
-exports.setupRouterGuard = setupRouterGuard;
+export {
+  setupRouterGuard
+};

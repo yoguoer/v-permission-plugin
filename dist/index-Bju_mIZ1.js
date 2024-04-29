@@ -1,6 +1,9 @@
-import Cookies from "js-cookie";
-import { defineStore } from "pinia";
-import { store } from "./index-DPhoIAbk.mjs";
+"use strict";
+Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
+const Cookies = require("js-cookie");
+const index = require("./permission.js");
+const pinia = require("pinia");
+const index$1 = require("./index-DKjqm6ao.js");
 const _Storage = class _Storage {
   /**
    * 获取 Cookies
@@ -124,23 +127,21 @@ _Storage.getSessionStorage = (k) => {
   }
 };
 let Storage = _Storage;
-const TOKEN_KEY = "PMP_TOKEN__";
-const OA_TOKEN_KEYS = ["SIAMTGT", "SIAMJWT"];
 function getToken(key) {
-  const setKey = key || TOKEN_KEY;
+  const setKey = key || index.tokenkeys.TOKEN_KEY;
   return Storage.getCookies(setKey);
 }
 function setToken(token) {
-  return Storage.setCookies(TOKEN_KEY, token);
+  return Storage.setCookies(index.tokenkeys.TOKEN_KEY, token);
 }
 function removeToken(domain) {
   removeOAToken(domain);
-  return Storage.removeCookies(TOKEN_KEY);
+  return Storage.removeCookies(index.tokenkeys.TOKEN_KEY);
 }
 function getOAToken(domain) {
   let key = null;
   let oaToken = null;
-  for (const keys of OA_TOKEN_KEYS) {
+  for (const keys of index.tokenkeys.OA_TOKEN_KEYS) {
     oaToken = Storage.getCookies(keys, {
       domain
     });
@@ -155,7 +156,7 @@ function getOAToken(domain) {
   };
 }
 function removeOAToken(domain) {
-  OA_TOKEN_KEYS.forEach(
+  index.tokenkeys.OA_TOKEN_KEYS.forEach(
     (key) => Storage.removeCookies(key, {
       domain
     })
@@ -172,7 +173,7 @@ function filterRoutes(routesInstans, routesMenuNames) {
     }
   }
 }
-const useRoutesStore = defineStore({
+const useRoutesStore = pinia.defineStore({
   id: "routes-store",
   state: () => ({
     routes: [],
@@ -248,9 +249,9 @@ const useRoutesStore = defineStore({
   }
 });
 function routesStoreWithOut() {
-  return useRoutesStore(store);
+  return useRoutesStore(index$1.store);
 }
-const useUserStore = defineStore({
+const useUserStore = pinia.defineStore({
   id: "user-store",
   state: () => ({
     authority: {
@@ -351,7 +352,7 @@ const useUserStore = defineStore({
   }
 });
 function useUserStoreWithOut() {
-  return useUserStore(store);
+  return useUserStore(index$1.store);
 }
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
@@ -424,6 +425,4 @@ async function setupRouterGuard(pOptions) {
   const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
   createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
 }
-export {
-  setupRouterGuard
-};
+exports.setupRouterGuard = setupRouterGuard;
