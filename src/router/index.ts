@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, type RouteRecordRaw } from "vue-router";
 import type { AppRouteModule } from "@/types/router";
-import type { setupRouterOptions } from "@/types/store";
+import type { SetupRouterOptions } from "@/types/store";
 import type { App } from "vue";
 
 // 创建一个可以被 Vue 应用程序使用的路由实例
@@ -24,7 +24,7 @@ function hasRouteraBeenSetup(app: App<Element>): boolean {
 
 // config router
 // 配置路由器
-export function setupRouter(rOptions: setupRouterOptions) {
+export function setupRouter(rOptions: SetupRouterOptions) {
   const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
   let route; // 尝试从应用实例上获取路由器
   if (!router && !hasRouteraBeenSetup(app)) {

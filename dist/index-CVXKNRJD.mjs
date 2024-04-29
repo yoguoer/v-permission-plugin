@@ -1,16 +1,21 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const Cookies = require("js-cookie");
-const index = require("./permission.js");
-const pinia = require("pinia");
-const index$1 = require("./index-DKjqm6ao.js");
-const _Storage = class _Storage {
-  /**
-   * 获取 Cookies
-   * @param key 
-   * @returns 
-   */
-  static getCookies(key, params) {
+import Cookies from "js-cookie";
+import { tokenkeys, storageOptions } from "./permission.mjs";
+import { defineStore } from "pinia";
+import { store } from "./index-DPhoIAbk.mjs";
+class Storage {
+  constructor(type) {
+    this.getSessionStorage = (k) => {
+      const item = window.sessionStorage.getItem(k);
+      try {
+        return item ? JSON.parse(item) : item;
+      } catch (err) {
+        return item;
+      }
+    };
+    this.type = type;
+  }
+  //获取 Cookies
+  getCookies(key, params) {
     const value = Cookies.get(key, params);
     if (value === void 0) {
       return null;
@@ -21,32 +26,19 @@ const _Storage = class _Storage {
       return value;
     }
   }
-  /**
-   * 设置 Cookies
-   * @param key 
-   * @param value 
-   * @param options 
-   */
-  static setCookies(key, value, options) {
+  //设置 Cookies
+  setCookies(key, value, options) {
     if (typeof value === "object") {
       value = JSON.stringify(value);
     }
     return Cookies.set(key, value, options);
   }
-  /**
-   * 移除 Cookies
-   * @param key 
-   * @param options 
-   */
-  static removeCookies(key, options) {
+  //移除某个Cookies
+  removeCookies(key, options) {
     Cookies.remove(key, options);
   }
-  /**
-   * 清除 Cookies
-   * @param key 
-   * @param options 
-   */
-  static clearCookies() {
+  //清除 Cookies
+  clearCookies() {
     const cookies = document.cookie.split(";");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i];
@@ -55,25 +47,16 @@ const _Storage = class _Storage {
       document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
     }
   }
-  /**
-  * * 存储本地会话数据
-  * @param k 键名
-  * @param v 键值（无需stringiiy）
-  * @returns RemovableRef
-  */
-  static setLocalStorage(k, v) {
+  //存储本地会话数据
+  setLocalStorage(k, v) {
     try {
       window.localStorage.setItem(k, JSON.stringify(v));
     } catch (error) {
       return false;
     }
   }
-  /**
-   * * 获取本地会话数据
-   * @param k 键名
-   * @returns any
-   */
-  static getLocalStorage(k) {
+  //获取本地会话数据
+  getLocalStorage(k) {
     const item = window.localStorage.getItem(k);
     try {
       return item ? JSON.parse(item) : item;
@@ -81,68 +64,128 @@ const _Storage = class _Storage {
       return item;
     }
   }
-  /**
-   * * 清空所有本地会话数据
-   * @param k 键名
-   * @returns any
-   */
-  static clearLocalStorage() {
+  //移除某个本地会话数据
+  removeLocalStorage(name) {
+    try {
+      return name ? window.localStorage.removeItem(name) : window.localStorage.clear();
+    } catch (err) {
+      return false;
+    }
+  }
+  //清空所有本地会话数据
+  clearLocalStorage() {
     try {
       return window.localStorage.clear();
     } catch (err) {
       return false;
     }
   }
-  /**
-   * * 存储临时会话数据
-   * @param k 键名
-   * @param v 键值
-   * @returns RemovableRef
-   */
-  static setSessionStorage(k, v) {
+  //存储临时会话数据
+  setSessionStorage(k, v) {
     try {
       window.sessionStorage.setItem(k, JSON.stringify(v));
     } catch (error) {
       return false;
     }
   }
-  /**
-   * * 清除本地会话数据
-   * @param name
-   */
-  static clearSessioStorage(name) {
+  //移除某个临时会话数据
+  removeSessionStorage(name) {
     try {
       return name ? window.sessionStorage.removeItem(name) : window.sessionStorage.clear();
     } catch (err) {
       return false;
     }
   }
-};
-_Storage.getSessionStorage = (k) => {
-  const item = window.sessionStorage.getItem(k);
-  try {
-    return item ? JSON.parse(item) : item;
-  } catch (err) {
-    return item;
+  //清空所有临时会话数据
+  clearSessionStorage() {
+    try {
+      return window.sessionStorage.clear();
+    } catch (err) {
+      return false;
+    }
   }
-};
-let Storage = _Storage;
+  setItem(key, value, options) {
+    switch (this.type) {
+      case "localStorage":
+        this.setLocalStorage(key, value);
+        break;
+      case "sessionStorage":
+        this.setSessionStorage(key, value);
+        break;
+      case "cookie":
+        this.setCookies(key, value, options);
+        break;
+      default:
+        throw new Error("Invalid storage type");
+    }
+  }
+  getItem(key, params) {
+    switch (this.type) {
+      case "localStorage":
+        return this.getLocalStorage(key);
+      case "sessionStorage":
+        return this.getSessionStorage(key);
+      case "cookie":
+        return this.getCookies(key, params);
+      default:
+        throw new Error("Invalid storage type");
+    }
+  }
+  removeItem(key, options) {
+    switch (this.type) {
+      case "localStorage":
+        this.removeLocalStorage(key);
+        break;
+      case "sessionStorage":
+        this.removeSessionStorage(key);
+        break;
+      case "cookie":
+        this.removeCookies(key, options);
+        break;
+      default:
+        throw new Error("Invalid storage type");
+    }
+  }
+  clear() {
+    switch (this.type) {
+      case "localStorage":
+        this.clearLocalStorage();
+        break;
+      case "sessionStorage":
+        this.clearSessionStorage();
+        break;
+      case "cookie":
+        this.clearCookies();
+        break;
+      default:
+        throw new Error("Invalid storage type");
+    }
+  }
+}
 function getToken(key) {
-  const setKey = key || index.tokenkeys.TOKEN_KEY;
-  return Storage.getCookies(setKey);
+  const setKey = key || tokenkeys.TOKEN_KEY;
+  const { type } = storageOptions;
+  const storage = new Storage(type);
+  return storage.getItem(setKey);
 }
 function setToken(token) {
-  return Storage.setCookies(index.tokenkeys.TOKEN_KEY, token);
+  const { type } = storageOptions;
+  const storage = new Storage(type);
+  return storage.setItem(tokenkeys.TOKEN_KEY, token);
 }
 function removeToken(domain) {
+  const { type } = storageOptions;
+  const storage = new Storage(type);
   removeOAToken(domain);
-  return Storage.removeCookies(index.tokenkeys.TOKEN_KEY);
+  return storage.removeItem(tokenkeys.TOKEN_KEY);
 }
 function getOAToken(domain) {
   let key = null;
   let oaToken = null;
-  for (const keys of index.tokenkeys.OA_TOKEN_KEYS) {
-    oaToken = Storage.getCookies(keys, {
+  const { type } = storageOptions;
+  const storage = new Storage(type);
+  for (const keys of tokenkeys.OA_TOKEN_KEYS) {
+    oaToken = storage.getItem(keys, {
       domain
     });
     if (oaToken) {
@@ -156,8 +199,10 @@ function getOAToken(domain) {
   };
 }
 function removeOAToken(domain) {
-  index.tokenkeys.OA_TOKEN_KEYS.forEach(
-    (key) => Storage.removeCookies(key, {
+  const { type } = storageOptions;
+  const storage = new Storage(type);
+  tokenkeys.OA_TOKEN_KEYS.forEach(
+    (key) => storage.removeItem(key, {
       domain
     })
   );
@@ -173,7 +218,7 @@ function filterRoutes(routesInstans, routesMenuNames) {
     }
   }
 }
-const useRoutesStore = pinia.defineStore({
+const useRoutesStore = defineStore({
   id: "routes-store",
   state: () => ({
     routes: [],
@@ -197,6 +242,11 @@ const useRoutesStore = pinia.defineStore({
     // 二级菜单展示路由
     getShowRouters() {
       return this.showRouters;
+    },
+    getAdminRoutes(asyncRoutes) {
+      var _a;
+      const asyncRoute = asyncRoutes[0] && ((_a = asyncRoutes[0]) == null ? void 0 : _a.children);
+      return asyncRoute;
     }
   },
   actions: {
@@ -249,9 +299,9 @@ const useRoutesStore = pinia.defineStore({
   }
 });
 function routesStoreWithOut() {
-  return useRoutesStore(index$1.store);
+  return useRoutesStore(store);
 }
-const useUserStore = pinia.defineStore({
+const useUserStore = defineStore({
   id: "user-store",
   state: () => ({
     authority: {
@@ -352,7 +402,7 @@ const useUserStore = pinia.defineStore({
   }
 });
 function useUserStoreWithOut() {
-  return useUserStore(index$1.store);
+  return useUserStore(store);
 }
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
@@ -425,4 +475,6 @@ async function setupRouterGuard(pOptions) {
   const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
   createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message);
 }
-exports.setupRouterGuard = setupRouterGuard;
+export {
+  setupRouterGuard
+};

@@ -13,7 +13,7 @@ export interface PermissionGuardOptions {
     Message: Function // 消息提示
 }
 
-export interface setupRouterOptions {
+export interface SetupRouterOptions {
     app: App<Element>,
     router: Router,
     publicPath: string,

@@ -1,5 +1,6 @@
 import Storage from "@/utils/storage";
 import tokenkeys from "@/utils/tokenKey";
+import storageOptions from "@/utils/setStorage";
 
 // oa 中单点登录使用 token 可能存在两个 key 值，需要循环使用两个 key 获取 cookies 中的 token
 // 旧 OA 使用 SIAMJWT, 新 OA 使用 SIAMTGT 和 LtpaToken
@@ -17,7 +18,9 @@ interface tokenInfoType {
  * @param {*} param
  */
 export function setTokenInfo({ token, expire, key, ticketName, ticketValue }: tokenInfoType, domain: string): viod {
-  Storage.setCookies(tokenkeys.TOKEN_KEY, token)
+  const { type } = storageOptions
+  const storage = new Storage(type);
+  storage.setItem(tokenkeys.TOKEN_KEY, token)
   return setOAToken(ticketName, ticketValue, domain)
 }
 
@@ -36,7 +39,9 @@ export function removeAuthToken(domain: string) {
  */
 export function getToken(key?: string | undefined): string {
   const setKey = key || tokenkeys.TOKEN_KEY
-  return Storage.getCookies(setKey) as string
+  const { type } = storageOptions
+  const storage = new Storage(type);
+  return storage.getItem(setKey) as string
 }
 
 /**
@@ -45,7 +50,9 @@ export function getToken(key?: string | undefined): string {
  * @returns
  */
 export function setToken(token: string | null | undefined) {
-  return Storage.setCookies(tokenkeys.TOKEN_KEY, token)
+  const { type } = storageOptions
+  const storage = new Storage(type);
+  return storage.setItem(tokenkeys.TOKEN_KEY, token)
 }
 
 /**
@@ -53,8 +60,10 @@ export function setToken(token: string | null | undefined) {
  * @returns
  */
 export function removeToken(domain: string) {
+  const { type } = storageOptions
+  const storage = new Storage(type);
   removeOAToken(domain)
-  return Storage.removeCookies(tokenkeys.TOKEN_KEY)
+  return storage.removeItem(tokenkeys.TOKEN_KEY)
 }
 
 interface oaTokensType {
@@ -68,9 +77,10 @@ interface oaTokensType {
 export function getOAToken(domain: string): oaTokensType {
   let key = null
   let oaToken = null
-
+  const { type } = storageOptions
+  const storage = new Storage(type);
   for (const keys of tokenkeys.OA_TOKEN_KEYS) {
-    oaToken = Storage.getCookies(keys, {
+    oaToken = storage.getItem(keys, {
       domain: domain
     })
     if (oaToken) {
@@ -92,7 +102,9 @@ export function getOAToken(domain: string): oaTokensType {
  * @returns
  */
 export function setOAToken(tokenKey: string, token: string, domain: string) {
-  return Storage.setCookies(tokenKey, token, {
+  const { type } = storageOptions
+  const storage = new Storage(type);
+  return storage.setItem(tokenKey, token, {
     expires: new Date(new Date().getTime() + 1 * 60 * 60 * 1000),
     domain: domain
   })
@@ -102,8 +114,10 @@ export function setOAToken(tokenKey: string, token: string, domain: string) {
  * 清空所有 oa token
  */
 export function removeOAToken(domain: string) {
+  const { type } = storageOptions
+  const storage = new Storage(type);
   tokenkeys.OA_TOKEN_KEYS.forEach((key: string) =>
-    Storage.removeCookies(key, {
+  storage.removeItem(key, {
       domain: domain
     })
   )

@@ -58,6 +58,11 @@ export const useRoutesStore = defineStore({
     getShowRouters(): RouteItem | Object {
       return this.showRouters;
     },
+
+    getAdminRoutes(asyncRoutes: AppRouteModule[]): Array<RouteItem | null> {
+      const asyncRoute = (asyncRoutes[0] && asyncRoutes[0]?.children) as Array<RouteItem>;
+      return asyncRoute;
+    }
   },
 
   actions: {
@@ -122,8 +127,3 @@ export function routesStoreWithOut() {
   return useRoutesStore(store);
 }
 
-// 获取后台管理路由
-export function getAdminRoutes(asyncRoutes: AppRouteModule[]): Array<RouteItem | null> {
-  const asyncRoute = (asyncRoutes[0] && asyncRoutes[0]?.children) as Array<RouteItem>;
-  return asyncRoute;
-}

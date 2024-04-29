@@ -32,6 +32,8 @@ export default initPermission;
 //暴露处理菜单名称列表的方法
 export  { getRouteNames } from '@/utils/getRouteNames'; 
 // 暴露获取后台管理路由的方法
-export  { getAdminRoutes } from '@/store/routes'; 
+// export  { getAdminRoutes } from '@/store/routes'; 
 //暴露设置key的方法
 export  { default as tokenkeys, setKeys }  from '@/utils/tokenKey'; 
+// 暴露设置存储方式的方法
+export  { default as storageOptions, setStorage } from '@/utils/setStorage'; 

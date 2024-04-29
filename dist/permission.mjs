@@ -37,12 +37,23 @@ function setKeys(keyOptions) {
     tokenkeys.USER_ASYNC_ROUTE_KEY = keyOptions.user_async_route_key;
   }
 }
+const storageOptions = {
+  type: "cookie",
+  expires: void 0
+};
+function setStorage(options) {
+  const { type, expires } = options;
+  if (type)
+    storageOptions.type = type;
+  if (expires)
+    storageOptions.expires = expires;
+}
 const initRoute = async (app, options) => {
   const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
   const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
   return await import("./index-CBMcCQCN.mjs").then(async (routerMethod) => {
     const routeInstance = routerMethod.setupRouter(rOptions);
-    const guard = await import("./index-Di_Ec676.mjs");
+    const guard = await import("./index-CVXKNRJD.mjs");
     const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
     guard.setupRouterGuard(pOptions);
   });
@@ -60,5 +71,7 @@ export {
   initPermission as default,
   getRouteNames,
   setKeys,
+  setStorage,
+  storageOptions,
   tokenkeys
 };
