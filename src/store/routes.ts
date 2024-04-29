@@ -48,14 +48,16 @@ export const useRoutesStore = defineStore({
     getRoutes(): Array<RouteItem> {
       return this.routes;
     },
+
     // 异步路由
     getAddRoutes(): Array<RouteItem> {
       return this.addRoutes;
     },
+
     // 二级菜单展示路由
     getShowRouters(): RouteItem | Object {
       return this.showRouters;
-    }
+    },
   },
 
   actions: {
@@ -65,10 +67,12 @@ export const useRoutesStore = defineStore({
       this.addRoutes = asyncFilterRoutes //新增异步路由
       this.adminRoutes = asyncFilterRoutes.filter(route => route.name === 'AdminHome') //获取后台管理系统路由(前台未设置权限页面，因此异步路由即为后台管理路由)
     },
+
     // 设置侧边栏路由
     SetRoute(routes: Array<RouteItem>) {
       this.routes = routes
     },
+
     // 清空路由数据
     ClearRoute() {
       this.addRoutes = []
@@ -116,4 +120,10 @@ export const useRoutesStore = defineStore({
 
 export function routesStoreWithOut() {
   return useRoutesStore(store);
+}
+
+// 获取后台管理路由
+export function getAdminRoutes(asyncRoutes: AppRouteModule[]): Array<RouteItem | null> {
+  const asyncRoute = (asyncRoutes[0] && asyncRoutes[0]?.children) as Array<RouteItem>;
+  return asyncRoute;
 }
