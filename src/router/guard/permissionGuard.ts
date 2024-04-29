@@ -4,6 +4,7 @@ import { getToken, getOAToken } from "@/utils/token";
 import { routesStoreWithOut } from "@/store/routes";
 import { useUserStoreWithOut } from "@/store/user";
 import type { AppRouteModule } from "@/types/router";
+import { Message as showMsg } from '@/plugin/Message.ts';
 
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut()
@@ -92,7 +93,9 @@ export async function routerPermission(
                     type: "warning",
                 });
             } else {
-                alert("您没有权限访问页面,请联系系统管理员!")
+                showMsg.error({
+                    message: "您没有权限访问页面,请联系系统管理员!",
+                });
             }
             return false
         }

@@ -480,13 +480,119 @@ const useUserStore = defineStore({
 function useUserStoreWithOut() {
   return useUserStore(store);
 }
+class Message {
+  constructor(options = {}) {
+    this.options = options;
+    this.messageInstance = null;
+    this.createMessage();
+  }
+  createMessage() {
+    const { type, message, duration = 3e3, showClose = false, onClose } = this.options;
+    const messageEl = document.createElement("div");
+    messageEl.classList.add("xw-ui-http-message", `xw-ui-http-message__${type || "info"}`, "xw-ui-http-message--info");
+    messageEl.style.position = "fixed";
+    messageEl.style.top = "5%";
+    messageEl.style.left = "50%";
+    messageEl.style.transform = "translate(-50%, -50%)";
+    messageEl.style.zIndex = 1e3;
+    if (showClose) {
+      const closeBtn = document.createElement("button");
+      closeBtn.classList.add("xw-ui-http-message__close-btn");
+      closeBtn.textContent = "×";
+      closeBtn.onclick = () => this.close();
+      messageEl.appendChild(closeBtn);
+    }
+    if (typeof message === "string") {
+      messageEl.textContent = message;
+    } else if (typeof message === "function") {
+      messageEl.appendChild(message());
+    }
+    document.body.appendChild(messageEl);
+    if (duration > 0) {
+      this.timeout = setTimeout(() => this.close(), duration);
+    }
+    if (onClose) {
+      this.onClose = onClose;
+    }
+    this.messageInstance = messageEl;
+  }
+  close() {
+    if (this.messageInstance) {
+      this.messageInstance.remove();
+      this.messageInstance = null;
+    }
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
+    if (this.onClose) {
+      this.onClose();
+    }
+  }
+  // 静态方法，用于创建不同类型的消息
+  static create(options) {
+    return new Message(options);
+  }
+  // 预定义不同类型的消息
+  static success(options) {
+    return this.create({ ...options, type: "success" });
+  }
+  static error(options) {
+    return this.create({ ...options, type: "error" });
+  }
+  static warning(options) {
+    return this.create({ ...options, type: "warning" });
+  }
+  static info(options) {
+    return this.create({ ...options, type: "info" });
+  }
+  // 关闭所有消息的实例
+  static closeAll() {
+    document.querySelectorAll(".xw-ui-http-message").forEach((messageEl) => {
+      messageEl.remove();
+    });
+  }
+}
+const style = document.createElement("style");
+style.textContent = `
+.xw-ui-http-message {
+  border: 1px solid #dcdfe6;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  width: 40vw;
+  padding: 10px;
+  color: white;
+  text-align: center;
+}
+.xw-ui-http-message__close-btn {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+.xw-ui-http-message__success {
+  background-color: #67C23A;
+}
+
+.xw-ui-http-message__error {
+  background-color: #F56C6C;
+}
+
+.xw-ui-http-message__info {
+  background-color: #909399;
+}
+
+.xw-ui-http-message__warning {
+  background-color: #E6A23C;
+}
+`;
+document.head.appendChild(style);
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
-async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message) {
+async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message2) {
   router.isReady().then(() => {
     router.beforeEach(async (to, from, next) => {
       if (getToken()) {
-        return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message);
+        return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message2);
       } else {
         const { oaToken } = getOAToken(domain);
         if (oaToken) {
@@ -506,7 +612,7 @@ async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes
     });
   });
 }
-async function routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message) {
+async function routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message$1) {
   if (to.path == "/login" && from) {
     if (from.path === "/login" || "/") {
       return next();
@@ -518,13 +624,15 @@ async function routerPermission(to, from, next, whiteList, asyncRoutes, basicRou
     if (canAccess) {
       return next();
     } else {
-      if (Message) {
-        Message({
+      if (Message$1) {
+        Message$1({
           message: "您没有权限访问页面,请联系系统管理员!",
           type: "warning"
         });
       } else {
-        alert("您没有权限访问页面,请联系系统管理员!");
+        Message.error({
+          message: "您没有权限访问页面,请联系系统管理员!"
+        });
       }
       return false;
     }
@@ -551,12 +659,12 @@ function getPermissionRoutes(asyncRoutes) {
   return routeStore.getAdminRoutes(asyncRoutes || []);
 }
 const initRoute = async (app, options) => {
-  const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
+  const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 } = options;
   const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
   return await import("./index-CBMcCQCN.mjs").then(async (routerMethod) => {
     const routeInstance = routerMethod.setupRouter(rOptions);
     const guard = await import("./index-Dpv-kP41.mjs");
-    const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
+    const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 };
     guard.setupRouterGuard(pOptions);
   });
 };
