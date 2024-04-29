@@ -27,14 +27,17 @@ var permission = function(vueRouter2, Cookies2, pinia2) {
       routes: [...asyncRoutes, ...basicRoutes]
     });
   }
+  function hasRouteraBeenSetup(app) {
+    return app.config.globalProperties.$router !== void 0;
+  }
   function setupRouter(rOptions) {
     const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
     let route;
-    if (!router) {
+    if (!router && !hasRouteraBeenSetup(app)) {
       route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
       app.use(route);
     } else {
-      route = router;
+      route = router || app.config.globalProperties.$router;
       console.log("router has already been set up.");
     }
     return route;

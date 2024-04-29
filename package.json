@@ -1,6 +1,6 @@
 {
   "name": "vivien-permission",
-  "version": "1.0.75",
+  "version": "1.0.78",
   "description": "vue3路由权限插件",
   "main": "/dist/permission.js",
   "scripts": {

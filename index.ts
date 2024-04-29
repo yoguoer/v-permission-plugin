@@ -3,7 +3,7 @@ import type { permissionOptions } from "@/types/store";
 // 初始化路由
 const initRoute = async (app: any, options: permissionOptions) => {
   const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = options;
-  const rOptions = { app,router, publicPath, asyncRoutes, basicRoutes }
+  const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes }
   return await import("@/router").then(async (routerMethod: any) => {
     // 创建路由实例
     const routeInstance  = routerMethod.setupRouter(rOptions);

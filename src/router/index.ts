@@ -18,22 +18,22 @@ export function toCreateRouter(
 }
   
 
-// function hasRouteraBeenSetup(app: App<Element>) {
-//   return app.config.globalProperties.$router !== undefined;
-// }
+function hasRouteraBeenSetup(app: App<Element>): boolean {
+  return app.config.globalProperties.$router !== undefined; //已经创建为true，未创建为false
+}
 
 // config router
 // 配置路由器
 export function setupRouter(rOptions: setupRouterOptions) {
   const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
   let route; // 尝试从应用实例上获取路由器
-  if (!router) {
-    // 如果没有设置router，则创建并使用它  
+  if (!router && !hasRouteraBeenSetup(app)) {
+    // 如果没有设置router，则创建并使用它
     route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);  
     app.use(route);  
   } else {
     // 已经设置路由  
-    route = router
+    route = router || app.config.globalProperties.$router
     console.log('router has already been set up.');  
   }
   return route; // 无论app.$router是否存在，都会返回路由实例

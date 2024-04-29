@@ -11,7 +11,7 @@ import type { AppRouteModule } from "@/types/router";
  * @param roles
  */
 export function filterRoutes(routesInstans: Array<T>, routesMenuNames: Array<T>): void {
-  // 开发环境侧边栏路由不由 srdpm 后端管理系统控制
+  // 开发环境侧边栏路由不由后端管理系统控制
   // if (process.env.NODE_ENV === envEnum.DEVELOPMENT) return
   // 测试和生产环境下，对常量路由进行过滤
   for (let i = 0; i < routesInstans.length; i++) {
