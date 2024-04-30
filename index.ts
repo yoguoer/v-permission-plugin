@@ -29,11 +29,12 @@ async function initPermission(app: any, options: permissionOptions) {
 
 export default initPermission;
 
-//暴露处理菜单名称列表的方法
+//处理菜单名称列表
 export  { getRouteNames } from '@/utils/getRouteNames'; 
-// 暴露获取后台管理路由的方法 getPermissionRoutes
+//各种路由相关的方法：getRoutes|getAddRoutes|getShowRouters|getAdminRoutes|SetRoutes|SetRoute|ClearRoute|SetShowRouters
+//各种用户相关的方法：getToken|getAuthority|SetToken|SetAuthority|GetAuthority|CheckOaLogin|Logout|ClearLocal
 export * from '@/router/guard/permissionGuard'; 
-//暴露设置key的方法
-export  { default as tokenkeys, setKeys }  from '@/utils/tokenKey'; 
-// 暴露设置存储方式的方法
-export  { default as storageOptions, setStorage } from '@/utils/setStorage'; 
+//设置key
+export  { default as tokenkeys, setKeys }  from '@/utils/token/tokenKey'; 
+// 设置存储方式
+export  { default as storageOptions, setStorage } from '@/utils/storage/setStorage'; 

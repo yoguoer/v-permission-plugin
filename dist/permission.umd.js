@@ -224,7 +224,7 @@
     if (expires)
       storageOptions.expires = expires;
   }
-  function getToken(key) {
+  function getToken$1(key) {
     const setKey = key || tokenkeys.TOKEN_KEY;
     const { type } = storageOptions;
     const storage = new Storage(type);
@@ -321,6 +321,7 @@
       getShowRouters() {
         return this.showRouters;
       },
+      // 获取后台管理路由
       getAdminRoutes(asyncRoutes) {
         var _a;
         const asyncRoute = asyncRoutes[0] && ((_a = asyncRoutes[0]) == null ? void 0 : _a.children);
@@ -398,7 +399,7 @@
     }),
     getters: {
       getToken() {
-        return getToken();
+        return getToken$1();
       },
       getAuthority() {
         return this.authority || {};
@@ -593,7 +594,7 @@
   async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message2) {
     router.isReady().then(() => {
       router.beforeEach(async (to, from, next) => {
-        if (getToken()) {
+        if (getToken$1()) {
           return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message2);
         } else {
           const { oaToken } = getOAToken(domain);
@@ -657,8 +658,56 @@
       return false;
     }
   }
-  function getPermissionRoutes(asyncRoutes) {
+  function getAdminRoutes(asyncRoutes) {
     return routeStore.getAdminRoutes(asyncRoutes || []);
+  }
+  function getRoutes() {
+    return routeStore.getRoutes;
+  }
+  function getAddRoutes() {
+    return routeStore.getAddRoutes;
+  }
+  function getShowRouters() {
+    return routeStore.getShowRouters;
+  }
+  async function SetRoutes(asyncFilterRoutes, constantAsyncRoutes) {
+    await routeStore.SetRoutes(asyncFilterRoutes, constantAsyncRoutes);
+  }
+  async function SetRoute(routes) {
+    await routeStore.SetRoute(routes);
+  }
+  async function ClearRoute() {
+    await routeStore.ClearRoute();
+  }
+  async function SetShowRouters(routes) {
+    return await routeStore.SetShowRouters(routes);
+  }
+  async function GenerateRoutes(routesMenuNames, asyncRoutes, basicRoutes) {
+    return await routeStore.GenerateRoutes(routesMenuNames, asyncRoutes, basicRoutes);
+  }
+  function getToken() {
+    return userStore.getToken;
+  }
+  function getAuthority() {
+    return userStore.getAuthority;
+  }
+  async function SetToken(data) {
+    await userStore.SetToken(data);
+  }
+  async function SetAuthority(authority) {
+    await userStore.getAuthority(authority);
+  }
+  async function GetAuthority(getAuthList, domain) {
+    return await userStore.GetAuthority(getAuthList, domain);
+  }
+  async function CheckOaLogin(checkOaLogin, domain) {
+    return await userStore.CheckOaLogin(checkOaLogin, domain);
+  }
+  async function Logout(domain) {
+    await userStore.Logout(domain);
+  }
+  async function ClearLocal(domain) {
+    await userStore.ClearLocal(domain);
   }
   const initRoute = async (app, options) => {
     const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 } = options;
@@ -715,11 +764,27 @@
     __proto__: null,
     setupRouterGuard
   }, Symbol.toStringTag, { value: "Module" }));
+  exports2.CheckOaLogin = CheckOaLogin;
+  exports2.ClearLocal = ClearLocal;
+  exports2.ClearRoute = ClearRoute;
+  exports2.GenerateRoutes = GenerateRoutes;
+  exports2.GetAuthority = GetAuthority;
+  exports2.Logout = Logout;
+  exports2.SetAuthority = SetAuthority;
+  exports2.SetRoute = SetRoute;
+  exports2.SetRoutes = SetRoutes;
+  exports2.SetShowRouters = SetShowRouters;
+  exports2.SetToken = SetToken;
   exports2.canUserAccess = canUserAccess;
   exports2.createPermissionGuard = createPermissionGuard;
   exports2.default = initPermission;
-  exports2.getPermissionRoutes = getPermissionRoutes;
+  exports2.getAddRoutes = getAddRoutes;
+  exports2.getAdminRoutes = getAdminRoutes;
+  exports2.getAuthority = getAuthority;
   exports2.getRouteNames = getRouteNames;
+  exports2.getRoutes = getRoutes;
+  exports2.getShowRouters = getShowRouters;
+  exports2.getToken = getToken;
   exports2.routerPermission = routerPermission;
   exports2.setKeys = setKeys;
   exports2.setStorage = setStorage;

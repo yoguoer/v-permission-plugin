@@ -2,21 +2,8 @@ import Storage from "@/utils/storage";
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import { getToken, setToken, removeToken, getOAToken } from "@/utils/token";
-import storageOptions from "@/utils/setStorage";
-
-export interface authorityType {
-  menuNames: Array<T>, // 菜单权限名称列表
-  rule: Array<T>,// 按钮级别权限
-}
-
-export interface TokenType {
-  token?: string | undefined | null,
-  expire?: string | undefined | null,
-  oa?: {
-    ticketName?: string | undefined | null,
-    ticketValue?: string | undefined | null,
-  }
-}
+import storageOptions from "@/utils/storage/setStorage";
+import { authorityType, TokenType } from "@/types/token";
 
 interface UserState {
   authority: authorityType,
@@ -78,11 +65,11 @@ export const useUserStore = defineStore({
     // 获取用户权限列表
     async GetAuthority(getAuthList: Function, domain: string): Promise<T> {
       try {
-        if(typeof getAuthList !== "function") {
+        if (typeof getAuthList !== "function") {
           return Error("getAuthList 参数错误")
         }
-        const authority: authorityType =  {
-          menuNames:[], // 菜单权限名称列表
+        const authority: authorityType = {
+          menuNames: [], // 菜单权限名称列表
           rule: [],// 按钮级别权限
         }
         const data = await getAuthList()
@@ -101,7 +88,7 @@ export const useUserStore = defineStore({
       const { key, oaToken } = getOAToken(domain);
       if (!oaToken) return false;
       try {
-        if(typeof checkOaLogin !== "function") {
+        if (typeof checkOaLogin !== "function") {
           return Error("checkOaLogin 参数错误")
         }
         const data = await checkOaLogin({
