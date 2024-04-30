@@ -29,7 +29,6 @@ export function filterRoutes(routesInstans: Array<T>, routesMenuNames: Array<T>)
 interface routesState {
   routes: Array<RouteItem>;
   addRoutes: Array<RouteItem>;
-  adminRoutes: Array<RouteItem>;
   showRouters: Array<RouteItem> | Object;
 }
 
@@ -39,7 +38,6 @@ export const useRoutesStore = defineStore({
   state: (): routesState => ({
     routes: [], // 权限路由
     addRoutes: [], // 异步路由
-    adminRoutes: [],//后台管理异步路由
     showRouters: {} // 后台管理-二级展示的路由
   }),
 
@@ -59,19 +57,18 @@ export const useRoutesStore = defineStore({
       return this.showRouters;
     },
 
-    // 获取后台管理路由
-    getAdminRoutes(asyncRoutes: AppRouteModule[]): Array<RouteItem | null> {
+    // 获取异步路由
+    getAsyncRoutes(asyncRoutes: AppRouteModule[]): Array<RouteItem | null> {
       const asyncRoute = (asyncRoutes[0] && asyncRoutes[0]?.children) as Array<RouteItem>;
       return asyncRoute;
     }
   },
 
   actions: {
-    // 设置侧边栏路由
+    // 设置所有路由
     SetRoutes(asyncFilterRoutes: Array<T>, constantAsyncRoutes: Array<T>) {
       this.routes = constantAsyncRoutes.concat(asyncFilterRoutes).sort((value1: RouteItem, value2: RouteItem) => value1?.order - value2?.order) //所有路由
-      this.addRoutes = asyncFilterRoutes //新增异步路由
-      this.adminRoutes = asyncFilterRoutes.filter(route => route.name === 'AdminHome') //获取后台管理系统路由(前台未设置权限页面，因此异步路由即为后台管理路由)
+      this.addRoutes = asyncFilterRoutes //新增异步路由获取后台管理系统路由(前台未设置权限页面，因此异步路由即为后台管理路由)
     },
 
     // 设置侧边栏路由

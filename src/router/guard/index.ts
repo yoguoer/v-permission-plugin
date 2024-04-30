@@ -1,4 +1,5 @@
 import { createPermissionGuard } from '@/router/guard/permissionGuard';
+import  exportFunctions  from '@/router/guard/exportFunctions';
 import type { PermissionGuardOptions } from "@/types/store";
 
 
@@ -8,4 +9,5 @@ export async function setupRouterGuard(pOptions: PermissionGuardOptions) {
     const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message } = pOptions;
     // 使用参数
     createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message)
+    return exportFunctions
 }

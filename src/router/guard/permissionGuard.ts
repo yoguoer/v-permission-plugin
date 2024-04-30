@@ -5,7 +5,6 @@ import { routesStoreWithOut } from "@/store/routes";
 import { useUserStoreWithOut } from "@/store/user";
 import type { AppRouteModule } from "@/types/router";
 import { Message as showMsg } from '@/plugin/Message.ts';
-import { authorityType, TokenType } from "@/types/token";
 
 const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
@@ -136,77 +135,3 @@ export async function canUserAccess(
 
 }
 
-// --------------------------路由相关--------------------------
-// 获取后台管理路由
-export function getAdminRoutes(asyncRoutes: AppRouteModule[]) {
-    return routeStore.getAdminRoutes(asyncRoutes || [])
-}
-// 获取所有路由
-export function getRoutes() {
-    return routeStore.getRoutes
-}
-// 获取异步路由
-export function getAddRoutes() {
-    return routeStore.getAddRoutes
-}
-// 获取二级菜单展示路由
-export function getShowRouters() {
-    return routeStore.getShowRouters
-}
-
-// 设置侧边栏路由
-export async function SetRoutes(asyncFilterRoutes: Array<T>, constantAsyncRoutes: Array<T>) {
-    await routeStore.SetRoutes(asyncFilterRoutes,constantAsyncRoutes)
-}
-// 设置侧边栏路由
-export async function SetRoute(routes: Array<RouteItem>) {
-    await routeStore.SetRoute(routes)
-}
-// 清空路由数据
-export async function ClearRoute() {
-    await routeStore.ClearRoute()
-}
-// 设置二级菜单显示的路由
-export async function SetShowRouters(routes: RouteItem) {
-    return await routeStore.SetShowRouters(routes)
-}
-// 生成异步路由
-export async function GenerateRoutes(routesMenuNames: Array<RouteItem>, asyncRoutes: AppRouteModule[], basicRoutes: AppRouteModule[]) {
-    return await routeStore.GenerateRoutes(routesMenuNames,asyncRoutes,basicRoutes)
-}
-
-
-// --------------------------用户相关--------------------------
-// 获取token
-export function getToken() {
-    return userStore.getToken
-}
-// 获取权限列表
-export function getAuthority() {
-    return userStore.getAuthority
-}
-
-// 设置token
-export async function SetToken(data: TokenType) {
-    await userStore.SetToken(data)
-}
-// 设置权限列表
-export async function SetAuthority(authority: authorityType) {
-    await userStore.getAuthority(authority)
-}
-// 获取用户权限列表
-export async function GetAuthority(getAuthList: Function, domain: string) {
-    return await userStore.GetAuthority(getAuthList, domain)
-}
-// 使用 oa token 登录系统
-export async function CheckOaLogin(checkOaLogin: Function, domain: string) {
-    return await userStore.CheckOaLogin(checkOaLogin, domain)
-}
-// 退出
-export async function Logout(domain: string) {
-    await userStore.Logout(domain)
-}
-// 清空存储数据
-export async function ClearLocal(domain: string) {
-    await userStore.ClearLocal(domain)
-}

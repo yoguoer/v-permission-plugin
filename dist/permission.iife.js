@@ -1,5 +1,9 @@
 var permission = function(exports, vueRouter2, Cookies2, pinia2) {
   "use strict";
+  function isFunction(functionToCheck) {
+    const getType = {};
+    return functionToCheck && getType.toString.call(functionToCheck) === "[object Function]";
+  }
   function getChildValue(data = [], arr = [], key = "", children = "children") {
     if (!key || data.length <= 0)
       return;
@@ -16,6 +20,90 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
     data.menuNames = menuNames;
     return data;
   }
+  const tokenkeys = {
+    TOKEN_KEY: "_TOKEN__",
+    OA_TOKEN_KEYS: ["SIAMTGT", "SIAMJWT"],
+    LOCALE_KEY: "_LOCALE__",
+    USER_INFO_KEY: "_USER__INFO__",
+    USER_AUTHORITY_KEY: "_USER__AUTHORITY__",
+    USER_ASYNC_ROUTE_KEY: "_USER_ASYNC_ROUTE_"
+  };
+  function setKeys(keyOptions) {
+    if (keyOptions.token_key)
+      tokenkeys.TOKEN_KEY = keyOptions.token_key;
+    if (keyOptions.oa_token_keys)
+      tokenkeys.OA_TOKEN_KEYS = keyOptions.oa_token_keys;
+    if (keyOptions.locale_key)
+      tokenkeys.LOCALE_KEY = keyOptions.locale_key;
+    if (keyOptions.user_info_key)
+      tokenkeys.USER_INFO_KEY = keyOptions.user_info_key;
+    if (keyOptions.user_authority_key)
+      tokenkeys.USER_AUTHORITY_KEY = keyOptions.user_authority_key;
+    if (keyOptions.user_async_route_key) {
+      tokenkeys.USER_ASYNC_ROUTE_KEY = keyOptions.user_async_route_key;
+    }
+  }
+  const storageOptions = {
+    type: "cookie",
+    expires: void 0
+  };
+  function setStorage(options) {
+    const { type, expires } = options;
+    if (type)
+      storageOptions.type = type;
+    if (expires)
+      storageOptions.expires = expires;
+  }
+  const initRoute = async (app, options) => {
+    const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 } = options;
+    const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
+    return await Promise.resolve().then(() => index$2).then(async (routerMethod) => {
+      const routeInstance = routerMethod.setupRouter(rOptions);
+      const guard = await Promise.resolve().then(() => index);
+      const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 };
+      return guard.setupRouterGuard(pOptions);
+    });
+  };
+  const initStore = async (app) => {
+    await Promise.resolve().then(() => index$1).then(async (store2) => {
+      await store2.setupStore(app);
+    });
+  };
+  async function initPermission(app, options, callback) {
+    await initStore(app);
+    const params = await initRoute(app, options);
+    if (callback && isFunction(callback)) {
+      callback(params);
+    }
+  }
+  function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
+    return vueRouter2.createRouter({
+      // 创建一个 hash 历史记录。
+      history: vueRouter2.createWebHashHistory(publicPath),
+      // 应该添加到路由的初始路由列表。
+      routes: [...asyncRoutes, ...basicRoutes]
+    });
+  }
+  function hasRouteraBeenSetup(app) {
+    return app.config.globalProperties.$router !== void 0;
+  }
+  function setupRouter(rOptions) {
+    const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
+    let route;
+    if (!router && !hasRouteraBeenSetup(app)) {
+      route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
+      app.use(route);
+    } else {
+      route = router || app.config.globalProperties.$router;
+      console.log("router has already been set up.");
+    }
+    return route;
+  }
+  const index$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+    __proto__: null,
+    setupRouter,
+    toCreateRouter
+  }, Symbol.toStringTag, { value: "Module" }));
   class Storage {
     constructor(type) {
       this.getSessionStorage = (k) => {
@@ -188,40 +276,6 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
       }
     }
   }
-  const tokenkeys = {
-    TOKEN_KEY: "_TOKEN__",
-    OA_TOKEN_KEYS: ["SIAMTGT", "SIAMJWT"],
-    LOCALE_KEY: "_LOCALE__",
-    USER_INFO_KEY: "_USER__INFO__",
-    USER_AUTHORITY_KEY: "_USER__AUTHORITY__",
-    USER_ASYNC_ROUTE_KEY: "_USER_ASYNC_ROUTE_"
-  };
-  function setKeys(keyOptions) {
-    if (keyOptions.token_key)
-      tokenkeys.TOKEN_KEY = keyOptions.token_key;
-    if (keyOptions.oa_token_keys)
-      tokenkeys.OA_TOKEN_KEYS = keyOptions.oa_token_keys;
-    if (keyOptions.locale_key)
-      tokenkeys.LOCALE_KEY = keyOptions.locale_key;
-    if (keyOptions.user_info_key)
-      tokenkeys.USER_INFO_KEY = keyOptions.user_info_key;
-    if (keyOptions.user_authority_key)
-      tokenkeys.USER_AUTHORITY_KEY = keyOptions.user_authority_key;
-    if (keyOptions.user_async_route_key) {
-      tokenkeys.USER_ASYNC_ROUTE_KEY = keyOptions.user_async_route_key;
-    }
-  }
-  const storageOptions = {
-    type: "cookie",
-    expires: void 0
-  };
-  function setStorage(options) {
-    const { type, expires } = options;
-    if (type)
-      storageOptions.type = type;
-    if (expires)
-      storageOptions.expires = expires;
-  }
   function getToken$1(key) {
     const setKey = key || tokenkeys.TOKEN_KEY;
     const { type } = storageOptions;
@@ -278,7 +332,7 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
       console.log("Pinia has already been set up.");
     }
   }
-  const index$2 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     setupStore,
     store
@@ -301,8 +355,6 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
       // 权限路由
       addRoutes: [],
       // 异步路由
-      adminRoutes: [],
-      //后台管理异步路由
       showRouters: {}
       // 后台管理-二级展示的路由
     }),
@@ -319,19 +371,18 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
       getShowRouters() {
         return this.showRouters;
       },
-      // 获取后台管理路由
-      getAdminRoutes(asyncRoutes) {
+      // 获取异步路由
+      getAsyncRoutes(asyncRoutes) {
         var _a;
         const asyncRoute = asyncRoutes[0] && ((_a = asyncRoutes[0]) == null ? void 0 : _a.children);
         return asyncRoute;
       }
     },
     actions: {
-      // 设置侧边栏路由
+      // 设置所有路由
       SetRoutes(asyncFilterRoutes, constantAsyncRoutes) {
         this.routes = constantAsyncRoutes.concat(asyncFilterRoutes).sort((value1, value2) => (value1 == null ? void 0 : value1.order) - (value2 == null ? void 0 : value2.order));
         this.addRoutes = asyncFilterRoutes;
-        this.adminRoutes = asyncFilterRoutes.filter((route) => route.name === "AdminHome");
       },
       // 设置侧边栏路由
       SetRoute(routes) {
@@ -587,8 +638,8 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
 }
 `;
   document.head.appendChild(style);
-  const routeStore = routesStoreWithOut();
-  const userStore = useUserStoreWithOut();
+  const routeStore$1 = routesStoreWithOut();
+  const userStore$1 = useUserStoreWithOut();
   async function createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message2) {
     router.isReady().then(() => {
       router.beforeEach(async (to, from, next) => {
@@ -598,10 +649,10 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
           const { oaToken } = getOAToken(domain);
           if (oaToken) {
             try {
-              await userStore.CheckOaLogin(checkOaLogin, domain);
+              await userStore$1.CheckOaLogin(checkOaLogin, domain);
               return next();
             } catch (err) {
-              userStore.ClearLocal(domain);
+              userStore$1.ClearLocal(domain);
               return next("/login?redirect=" + to.path);
             }
           } else if (whiteList.includes(to.name)) {
@@ -644,20 +695,22 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
     if (!to || (to == null ? void 0 : to.name) === "Login")
       return false;
     try {
-      let accessRoutes = userStore.getAuthority || {};
+      let accessRoutes = userStore$1.getAuthority || {};
       if ((accessRoutes == null ? void 0 : accessRoutes.menuNames) && ((_a = accessRoutes == null ? void 0 : accessRoutes.menuNames) == null ? void 0 : _a.length) === 0) {
-        accessRoutes = await userStore.GetAuthority(getAuthList, domain);
-        routeStore.GenerateRoutes((accessRoutes == null ? void 0 : accessRoutes.menuNames) || [], asyncRoutes, basicRoutes);
+        accessRoutes = await userStore$1.GetAuthority(getAuthList, domain);
+        routeStore$1.GenerateRoutes((accessRoutes == null ? void 0 : accessRoutes.menuNames) || [], asyncRoutes, basicRoutes);
       }
       const allRoutes = [...whiteList, ...accessRoutes == null ? void 0 : accessRoutes.menuNames];
       return allRoutes.length > 0 && allRoutes.includes(to.name);
     } catch (err) {
-      userStore.Logout(domain);
+      userStore$1.Logout(domain);
       return false;
     }
   }
-  function getAdminRoutes(asyncRoutes) {
-    return routeStore.getAdminRoutes(asyncRoutes || []);
+  const routeStore = routesStoreWithOut();
+  const userStore = useUserStoreWithOut();
+  function getAsyncRoutes(asyncRoutes) {
+    return routeStore.getAsyncRoutes(asyncRoutes || []);
   }
   function getRoutes() {
     return routeStore.getRoutes;
@@ -693,7 +746,7 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
     await userStore.SetToken(data);
   }
   async function SetAuthority(authority) {
-    await userStore.getAuthority(authority);
+    await userStore.SetAuthority(authority);
   }
   async function GetAuthority(getAuthList, domain) {
     return await userStore.GetAuthority(getAuthList, domain);
@@ -707,83 +760,36 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
   async function ClearLocal(domain) {
     await userStore.ClearLocal(domain);
   }
-  const initRoute = async (app, options) => {
-    const { publicPath, router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 } = options;
-    const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
-    return await Promise.resolve().then(() => index$1).then(async (routerMethod) => {
-      const routeInstance = routerMethod.setupRouter(rOptions);
-      const guard = await Promise.resolve().then(() => index);
-      const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 };
-      guard.setupRouterGuard(pOptions);
-    });
+  const exportFunctions = {
+    getAsyncRoutes,
+    getRoutes,
+    getAddRoutes,
+    getShowRouters,
+    SetRoutes,
+    SetRoute,
+    ClearRoute,
+    SetShowRouters,
+    GenerateRoutes,
+    getToken,
+    getAuthority,
+    SetToken,
+    SetAuthority,
+    GetAuthority,
+    CheckOaLogin,
+    Logout,
+    ClearLocal
   };
-  const initStore = async (app) => {
-    await Promise.resolve().then(() => index$2).then(async (store2) => {
-      await store2.setupStore(app);
-    });
-  };
-  async function initPermission(app, options) {
-    await initStore(app);
-    await initRoute(app, options);
-  }
-  function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
-    return vueRouter2.createRouter({
-      // 创建一个 hash 历史记录。
-      history: vueRouter2.createWebHashHistory(publicPath),
-      // 应该添加到路由的初始路由列表。
-      routes: [...asyncRoutes, ...basicRoutes]
-    });
-  }
-  function hasRouteraBeenSetup(app) {
-    return app.config.globalProperties.$router !== void 0;
-  }
-  function setupRouter(rOptions) {
-    const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
-    let route;
-    if (!router && !hasRouteraBeenSetup(app)) {
-      route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
-      app.use(route);
-    } else {
-      route = router || app.config.globalProperties.$router;
-      console.log("router has already been set up.");
-    }
-    return route;
-  }
-  const index$1 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
-    __proto__: null,
-    setupRouter,
-    toCreateRouter
-  }, Symbol.toStringTag, { value: "Module" }));
   async function setupRouterGuard(pOptions) {
     const { router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message: Message2 } = pOptions;
     createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message2);
+    return exportFunctions;
   }
   const index = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
     __proto__: null,
     setupRouterGuard
   }, Symbol.toStringTag, { value: "Module" }));
-  exports.CheckOaLogin = CheckOaLogin;
-  exports.ClearLocal = ClearLocal;
-  exports.ClearRoute = ClearRoute;
-  exports.GenerateRoutes = GenerateRoutes;
-  exports.GetAuthority = GetAuthority;
-  exports.Logout = Logout;
-  exports.SetAuthority = SetAuthority;
-  exports.SetRoute = SetRoute;
-  exports.SetRoutes = SetRoutes;
-  exports.SetShowRouters = SetShowRouters;
-  exports.SetToken = SetToken;
-  exports.canUserAccess = canUserAccess;
-  exports.createPermissionGuard = createPermissionGuard;
   exports.default = initPermission;
-  exports.getAddRoutes = getAddRoutes;
-  exports.getAdminRoutes = getAdminRoutes;
-  exports.getAuthority = getAuthority;
   exports.getRouteNames = getRouteNames;
-  exports.getRoutes = getRoutes;
-  exports.getShowRouters = getShowRouters;
-  exports.getToken = getToken;
-  exports.routerPermission = routerPermission;
   exports.setKeys = setKeys;
   exports.setStorage = setStorage;
   exports.storageOptions = storageOptions;
