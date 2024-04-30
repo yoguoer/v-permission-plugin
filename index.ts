@@ -25,6 +25,8 @@ const initStore = async (app: any) => {
 
 async function initPermission(app: any, options: permissionOptions, callback?: Function) {
   await initStore(app);
+  //各种路由相关的方法：getRoutes|getAddRoutes|getShowRouters|getAsyncRoutes|SetRoutes|SetRoute|ClearRoute|SetShowRouters
+  //各种用户相关的方法：getToken|getAuthority|SetToken|SetAuthority|GetAuthority|CheckOaLogin|Logout|ClearLocal
   const params = await initRoute(app, options);
   if (callback && isFunction(callback)) {
     callback(params)
@@ -35,8 +37,6 @@ export default initPermission;
 
 //处理菜单名称列表
 export { getRouteNames } from '@/utils/getRouteNames';
-//各种路由相关的方法：getRoutes|getAddRoutes|getShowRouters|getAsyncRoutes|SetRoutes|SetRoute|ClearRoute|SetShowRouters
-//各种用户相关的方法：getToken|getAuthority|SetToken|SetAuthority|GetAuthority|CheckOaLogin|Logout|ClearLocal
 //设置key
 export { default as tokenkeys, setKeys } from '@/utils/token/tokenKey';
 // 设置存储方式
