@@ -277,7 +277,7 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
     }
   }
   function getToken$1(key) {
-    const setKey = key || tokenkeys.TOKEN_KEY;
+    const setKey = tokenkeys.TOKEN_KEY;
     const { type } = storageOptions;
     const storage = new Storage(type);
     return storage.getItem(setKey);
@@ -434,22 +434,27 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
     state: () => ({
       authority: {
         menuNames: [],
-        // 菜单权限名称列表
+        // 菜单权限名称列表，取路由表中的 name 字段
         rule: []
         // 按钮级别权限
       },
       // token
       token: void 0,
       expire: void 0,
+      // token 过期时间
       oa: {
         ticketName: null,
+        // oa token key
         ticketValue: null
+        // oa token value
       }
     }),
     getters: {
+      // 获取 token
       getToken() {
         return getToken$1();
       },
+      // 获取所有权限
       getAuthority() {
         return this.authority || {};
       }
@@ -461,7 +466,7 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
           token = null
         } = data;
         this.token = token || "";
-        this.oa = oa;
+        this.oa = oa || { ticketName: null, ticketValue: null };
         setToken(token);
         if (oa.ticketName) {
           const { type } = storageOptions;
@@ -469,13 +474,14 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
           storage.setItem(oa.ticketName, oa.ticketValue);
         }
       },
+      // 设置用户所有权限列表
       SetAuthority(authority) {
         this.authority = authority;
       },
       // 获取用户权限列表
       async GetAuthority(getAuthList, domain) {
         try {
-          if (typeof getAuthList !== "function") {
+          if (!getAuthList || typeof getAuthList !== "function") {
             return Error("getAuthList 参数错误");
           }
           const authority = {
@@ -484,7 +490,9 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
             rule: []
             // 按钮级别权限
           };
-          const data = await getAuthList();
+          const data = await getAuthList({
+            token: getToken$1()
+          });
           authority.menuNames = data.menuNames;
           authority.rule = data.rule;
           this.SetAuthority(authority);
@@ -500,21 +508,28 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
         if (!oaToken)
           return false;
         try {
-          if (typeof checkOaLogin !== "function") {
+          if (!checkOaLogin || typeof checkOaLogin !== "function") {
             return Error("checkOaLogin 参数错误");
           }
           const data = await checkOaLogin({
             ticketName: key,
             ticketValue: oaToken
           });
+          setToken(data.token);
           return data;
         } catch (error) {
           this.Logout(domain);
         }
       },
       // 退出
-      async Logout(domain) {
+      async Logout(domain, logout) {
         try {
+          if (!logout || typeof logout !== "function") {
+            return Error("logout 参数错误");
+          }
+          await logout({
+            token: getToken$1()
+          });
         } catch (error) {
           console.error(error);
         } finally {
