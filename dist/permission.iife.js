@@ -277,7 +277,7 @@ var permission = function(exports, vueRouter2, Cookies2, pinia2) {
     }
   }
   function getToken$1(key) {
-    const setKey = key || tokenkeys.TOKEN_KEY;
+    const setKey = tokenkeys.TOKEN_KEY;
     const { type } = storageOptions;
     const storage = new Storage(type);
     return storage.getItem(setKey);

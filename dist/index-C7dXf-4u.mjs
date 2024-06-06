@@ -1,9 +1,7 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const Cookies = require("js-cookie");
-const index = require("./permission.js");
-const pinia = require("pinia");
-const index$1 = require("./index-DKjqm6ao.js");
+import Cookies from "js-cookie";
+import { tokenkeys, storageOptions } from "./permission.mjs";
+import { defineStore } from "pinia";
+import { store } from "./index-DPhoIAbk.mjs";
 class Storage {
   constructor(type) {
     this.getSessionStorage = (k) => {
@@ -177,28 +175,28 @@ class Storage {
   }
 }
 function getToken$1(key) {
-  const setKey = key || index.tokenkeys.TOKEN_KEY;
-  const { type } = index.storageOptions;
+  const setKey = tokenkeys.TOKEN_KEY;
+  const { type } = storageOptions;
   const storage = new Storage(type);
   return storage.getItem(setKey);
 }
 function setToken(token) {
-  const { type } = index.storageOptions;
+  const { type } = storageOptions;
   const storage = new Storage(type);
-  return storage.setItem(index.tokenkeys.TOKEN_KEY, token);
+  return storage.setItem(tokenkeys.TOKEN_KEY, token);
 }
 function removeToken(domain) {
-  const { type } = index.storageOptions;
+  const { type } = storageOptions;
   const storage = new Storage(type);
   removeOAToken(domain);
-  return storage.removeItem(index.tokenkeys.TOKEN_KEY);
+  return storage.removeItem(tokenkeys.TOKEN_KEY);
 }
 function getOAToken(domain) {
   let key = null;
   let oaToken = null;
-  const { type } = index.storageOptions;
+  const { type } = storageOptions;
   const storage = new Storage(type);
-  for (const keys of index.tokenkeys.OA_TOKEN_KEYS) {
+  for (const keys of tokenkeys.OA_TOKEN_KEYS) {
     oaToken = storage.getItem(keys, {
       domain
     });
@@ -213,9 +211,9 @@ function getOAToken(domain) {
   };
 }
 function removeOAToken(domain) {
-  const { type } = index.storageOptions;
+  const { type } = storageOptions;
   const storage = new Storage(type);
-  index.tokenkeys.OA_TOKEN_KEYS.forEach(
+  tokenkeys.OA_TOKEN_KEYS.forEach(
     (key) => storage.removeItem(key, {
       domain
     })
@@ -232,7 +230,7 @@ function filterRoutes(routesInstans, routesMenuNames) {
     }
   }
 }
-const useRoutesStore = pinia.defineStore({
+const useRoutesStore = defineStore({
   id: "routes-store",
   state: () => ({
     routes: [],
@@ -311,9 +309,9 @@ const useRoutesStore = pinia.defineStore({
   }
 });
 function routesStoreWithOut() {
-  return useRoutesStore(index$1.store);
+  return useRoutesStore(store);
 }
-const useUserStore = pinia.defineStore({
+const useUserStore = defineStore({
   id: "user-store",
   state: () => ({
     authority: {
@@ -348,7 +346,7 @@ const useUserStore = pinia.defineStore({
       this.oa = oa;
       setToken(token);
       if (oa.ticketName) {
-        const { type } = index.storageOptions;
+        const { type } = storageOptions;
         const storage = new Storage(type);
         storage.setItem(oa.ticketName, oa.ticketValue);
       }
@@ -414,7 +412,7 @@ const useUserStore = pinia.defineStore({
   }
 });
 function useUserStoreWithOut() {
-  return useUserStore(index$1.store);
+  return useUserStore(store);
 }
 class Message {
   constructor(options = {}) {
@@ -668,4 +666,6 @@ async function setupRouterGuard(pOptions) {
   createPermissionGuard(router, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message2);
   return exportFunctions;
 }
-exports.setupRouterGuard = setupRouterGuard;
+export {
+  setupRouterGuard
+};

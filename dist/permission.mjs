@@ -57,7 +57,7 @@ const initRoute = async (app, options) => {
   const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
   return await import("./index-CBMcCQCN.mjs").then(async (routerMethod) => {
     const routeInstance = routerMethod.setupRouter(rOptions);
-    const guard = await import("./index-BHD1WAqu.mjs");
+    const guard = await import("./index-C7dXf-4u.mjs");
     const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
     return guard.setupRouterGuard(pOptions);
   });
