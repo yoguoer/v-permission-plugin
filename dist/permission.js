@@ -59,7 +59,7 @@ const initRoute = async (app, options) => {
   const rOptions = { app, router, publicPath, asyncRoutes, basicRoutes };
   return await Promise.resolve().then(() => require("./index-ClJ3DnKQ.js")).then(async (routerMethod) => {
     const routeInstance = routerMethod.setupRouter(rOptions);
-    const guard = await Promise.resolve().then(() => require("./index-DH6_NSKR.js"));
+    const guard = await Promise.resolve().then(() => require("./index-CvT9TbF8.js"));
     const pOptions = { router: routeInstance, whiteList, asyncRoutes, basicRoutes, getAuthList, checkOaLogin, domain, Message };
     return guard.setupRouterGuard(pOptions);
   });

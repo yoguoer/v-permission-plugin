@@ -20,7 +20,7 @@ interface tokenInfoType {
 export function setTokenInfo({ token, expire, key, ticketName, ticketValue }: tokenInfoType, domain: string): viod {
   const { type } = storageOptions
   const storage = new Storage(type);
-  storage.setItem(tokenkeys.TOKEN_KEY, token as string)
+  storage.setItem(tokenkeys.TOKEN_KEY, token)
   return setOAToken(ticketName, ticketValue, domain)
 }
 
@@ -117,7 +117,7 @@ export function removeOAToken(domain: string) {
   const { type } = storageOptions
   const storage = new Storage(type);
   tokenkeys.OA_TOKEN_KEYS.forEach((key: string) =>
-    storage.removeItem(key, {
+  storage.removeItem(key, {
       domain: domain
     })
   )

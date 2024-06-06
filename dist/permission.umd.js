@@ -279,7 +279,7 @@
     }
   }
   function getToken$1(key) {
-    const setKey = tokenkeys.TOKEN_KEY;
+    const setKey = key || tokenkeys.TOKEN_KEY;
     const { type } = storageOptions;
     const storage = new Storage(type);
     return storage.getItem(setKey);
@@ -436,27 +436,22 @@
     state: () => ({
       authority: {
         menuNames: [],
-        // 菜单权限名称列表，取路由表中的 name 字段
+        // 菜单权限名称列表
         rule: []
         // 按钮级别权限
       },
       // token
       token: void 0,
       expire: void 0,
-      // token 过期时间
       oa: {
         ticketName: null,
-        // oa token key
         ticketValue: null
-        // oa token value
       }
     }),
     getters: {
-      // 获取 token
       getToken() {
         return getToken$1();
       },
-      // 获取所有权限
       getAuthority() {
         return this.authority || {};
       }
@@ -468,7 +463,7 @@
           token = null
         } = data;
         this.token = token || "";
-        this.oa = oa || { ticketName: null, ticketValue: null };
+        this.oa = oa;
         setToken(token);
         if (oa.ticketName) {
           const { type } = storageOptions;
@@ -476,14 +471,13 @@
           storage.setItem(oa.ticketName, oa.ticketValue);
         }
       },
-      // 设置用户所有权限列表
       SetAuthority(authority) {
         this.authority = authority;
       },
       // 获取用户权限列表
       async GetAuthority(getAuthList, domain) {
         try {
-          if (!getAuthList || typeof getAuthList !== "function") {
+          if (typeof getAuthList !== "function") {
             return Error("getAuthList 参数错误");
           }
           const authority = {
@@ -492,9 +486,7 @@
             rule: []
             // 按钮级别权限
           };
-          const data = await getAuthList({
-            token: getToken$1()
-          });
+          const data = await getAuthList();
           authority.menuNames = data.menuNames;
           authority.rule = data.rule;
           this.SetAuthority(authority);
@@ -510,28 +502,21 @@
         if (!oaToken)
           return false;
         try {
-          if (!checkOaLogin || typeof checkOaLogin !== "function") {
+          if (typeof checkOaLogin !== "function") {
             return Error("checkOaLogin 参数错误");
           }
           const data = await checkOaLogin({
             ticketName: key,
             ticketValue: oaToken
           });
-          setToken(data.token);
           return data;
         } catch (error) {
           this.Logout(domain);
         }
       },
       // 退出
-      async Logout(domain, logout) {
+      async Logout(domain) {
         try {
-          if (!logout || typeof logout !== "function") {
-            return Error("logout 参数错误");
-          }
-          await logout({
-            token: getToken$1()
-          });
         } catch (error) {
           console.error(error);
         } finally {

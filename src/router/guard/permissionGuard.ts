@@ -27,17 +27,16 @@ export async function createPermissionGuard(
      */
     router.isReady().then(() => {
 
-        router.beforeEach(async (to: any, from: any, next: Function) => {
-            // 判断用户是否已经登录，已经登录情况下，进入权限判断
+        router.beforeEach(async (to, from, next) => {
             if (toGetToken()) {
                 return await routerPermission(to, from, next, whiteList, asyncRoutes, basicRoutes, getAuthList, domain, Message)
             } else {
-                // 兼容oa 系统单点登录，获取 oa 中的 token
+                // 获取 oa 中的 token
                 const { oaToken } = getOAToken(domain)
-                // oa 存在 token，用户已经登录 oa
-                if (oaToken) {
+
+                if (oaToken) { // oa 存在 token，用户已经登录 oa
                     try {
-                        // 使用 oa token 换取当前系统的 token, 登录系统
+                        // 使用 oa token 登录系统
                         await userStore.CheckOaLogin(checkOaLogin, domain);
 
                         return next();
@@ -46,8 +45,7 @@ export async function createPermissionGuard(
                         return next("/login?redirect=" + to.path);
 
                     }
-                    // 用户未登录, 判断是否进入白名单页面路由
-                } else if (whiteList.includes(to.name as string)) {
+                } else if (whiteList.includes(to.name as string)) {            // 用户未登录
                     return next();
                 } else {
                     return next("/login?redirect=" + to.path);
@@ -85,7 +83,6 @@ export async function routerPermission(
             return next(from.path);
         }
     } else {
-        // 获取是否用户权限
         const canAccess = await canUserAccess(to, whiteList, asyncRoutes, basicRoutes, getAuthList, domain)
         if (canAccess) {
             return next()
@@ -126,9 +123,7 @@ export async function canUserAccess(
     try {
         let accessRoutes = userStore.getAuthority || {}
         if (accessRoutes?.menuNames && accessRoutes?.menuNames?.length === 0) {
-            // 获取用户异步路由权限
             accessRoutes = await userStore.GetAuthority(getAuthList, domain)
-            // 生成用户所有路由权限
             routeStore.GenerateRoutes(accessRoutes?.menuNames || [], asyncRoutes, basicRoutes)
         }
         const allRoutes = [...whiteList, ...accessRoutes?.menuNames]

@@ -105,7 +105,7 @@ export const useRoutesStore = defineStore({
       if (matched && matched.length > 0) { // 根据路由匹配路径获取二级顶部菜单栏名称
         topRouteName = matched[0].name
       }
-      const filterRouter = this.routes.map((item: RouteItem) => {
+      const filterRouter = this.routes.map(item => {
         if (item.name !== topRouteName) {
           item.hidden = true
         } else {
