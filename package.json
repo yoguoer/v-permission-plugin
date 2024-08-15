@@ -1,20 +1,16 @@
 {
   "name": "vivien-permission",
-  "version": "1.0.102",
-  "description": "vue3路由权限插件",
-  "main": "/dist/permission.js",
+  "version": "1.1.0",
+  "description": "vue3后台管理系统路由权限插件",
+  "main": "./dist/index.es.js",
+  "module": "./dist/index.cjs.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "vite build"
   },
   "author": "vivien",
   "license": "ISC",
-  "dependencies": {
-    "eslint": "^9.1.1",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.10"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.12.7"

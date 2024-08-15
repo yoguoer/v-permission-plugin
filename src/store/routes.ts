@@ -2,17 +2,16 @@
 import { defineStore } from "pinia";
 import { store } from "@/store";
 import type { RouteItem } from 'vue-router';
-import type { AppRouteModule } from "@/types/router";
-
+import type { AppRouteModule } from "@/types/router.d.ts";
+import globalState from '@/utils/GlobalState';
 /**
  * Filter asynchronous routing tables by recursion
  * 过滤没有权限的常量路由路由：递归前端路由，查找 name 不存在的路由，删除
  * @param routes asyncRoutes
  * @param roles
  */
-export function filterRoutes(routesInstans: Array<T>, routesMenuNames: Array<T>): void {
+export function filterRoutes(routesInstans: Array<any>, routesMenuNames: Array<any>): void {
   // 开发环境侧边栏路由不由后端管理系统控制
-  // if (process.env.NODE_ENV === envEnum.DEVELOPMENT) return
   // 测试和生产环境下，对常量路由进行过滤
   for (let i = 0; i < routesInstans.length; i++) {
     const route = routesInstans[i]
@@ -44,21 +43,26 @@ export const useRoutesStore = defineStore({
   getters: {
     // 所有路由
     getRoutes(): Array<RouteItem> {
+      // @ts-ignore
       return this.routes;
     },
 
     // 异步路由
     getAddRoutes(): Array<RouteItem> {
+      // @ts-ignore
       return this.addRoutes;
     },
 
     // 二级菜单展示路由
     getShowRouters(): RouteItem | Object {
+      // @ts-ignore
       return this.showRouters;
     },
 
     // 获取异步路由
-    getAsyncRoutes(asyncRoutes: AppRouteModule[]): Array<RouteItem | null> {
+    getAsyncRoutes(): Array<RouteItem | null > | undefined {
+      const asyncRoutes = globalState.getState('asyncRoutes');
+      if(!asyncRoutes) return undefined
       const asyncRoute = (asyncRoutes[0] && asyncRoutes[0]?.children) as Array<RouteItem>;
       return asyncRoute;
     }
@@ -66,20 +70,26 @@ export const useRoutesStore = defineStore({
 
   actions: {
     // 设置所有路由
-    SetRoutes(asyncFilterRoutes: Array<T>, constantAsyncRoutes: Array<T>) {
+    SetRoutes(asyncFilterRoutes: Array<any>, constantAsyncRoutes: Array<any>) {
+      // @ts-ignore
       this.routes = constantAsyncRoutes.concat(asyncFilterRoutes).sort((value1: RouteItem, value2: RouteItem) => value1?.order - value2?.order) //所有路由
+      // @ts-ignore
       this.addRoutes = asyncFilterRoutes //新增异步路由获取后台管理系统路由(前台未设置权限页面，因此异步路由即为后台管理路由)
     },
 
     // 设置侧边栏路由
     SetRoute(routes: Array<RouteItem>) {
+      // @ts-ignore
       this.routes = routes
     },
 
     // 清空路由数据
     ClearRoute() {
+      // @ts-ignore
       this.addRoutes = []
+      // @ts-ignore
       this.routes = []
+      // @ts-ignore
       this.showRouters = {}
     },
 
@@ -105,7 +115,8 @@ export const useRoutesStore = defineStore({
       if (matched && matched.length > 0) { // 根据路由匹配路径获取二级顶部菜单栏名称
         topRouteName = matched[0].name
       }
-      const filterRouter = this.routes.map(item => {
+      // @ts-ignore
+      const filterRouter = this.routes.map((item: RouteItem) => {
         if (item.name !== topRouteName) {
           item.hidden = true
         } else {

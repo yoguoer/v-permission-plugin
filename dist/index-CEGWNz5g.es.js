@@ -1,10 +1,9 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const vueRouter = require("vue-router");
+import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
+import { g as globalState } from "./index-DjAFU_cK.es.js";
 function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
-  return vueRouter.createRouter({
+  return createRouter({
     // 创建一个 hash 历史记录。
-    history: vueRouter.createWebHashHistory(publicPath),
+    history: globalState.getState("routerMode") === "hash" ? createWebHashHistory(publicPath) : createWebHistory(publicPath),
     // 应该添加到路由的初始路由列表。
     routes: [...asyncRoutes, ...basicRoutes]
   });
@@ -12,8 +11,8 @@ function toCreateRouter(publicPath, asyncRoutes, basicRoutes) {
 function hasRouteraBeenSetup(app) {
   return app.config.globalProperties.$router !== void 0;
 }
-function setupRouter(rOptions) {
-  const { app, router, publicPath, asyncRoutes, basicRoutes } = rOptions;
+function setupRouter(Options) {
+  const { app, router, publicPath, asyncRoutes, basicRoutes } = Options;
   let route;
   if (!router && !hasRouteraBeenSetup(app)) {
     route = toCreateRouter(publicPath, asyncRoutes, basicRoutes);
@@ -24,5 +23,7 @@ function setupRouter(rOptions) {
   }
   return route;
 }
-exports.setupRouter = setupRouter;
-exports.toCreateRouter = toCreateRouter;
+export {
+  setupRouter,
+  toCreateRouter
+};
