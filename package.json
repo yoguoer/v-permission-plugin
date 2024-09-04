@@ -1,5 +1,5 @@
 {
-  "name": "vivien-permission",
+  "name": "v-permission-plugin",
   "version": "1.1.0",
   "description": "vue3后台管理系统路由权限插件",
   "main": "./dist/index.es.js",
