@@ -11,7 +11,6 @@ const routeStore = routesStoreWithOut();
 const userStore = useUserStoreWithOut();
 
 // 获取全局变量
-
 export async function createPermissionGuard(
     router: Router,
     Message: Function | undefined
@@ -138,28 +137,53 @@ export async function canUserAccess(to: RouteItem) {
  * 解决刷新不触发 router.beforeEach 回调bug
  * @returns
  */
-export async function reloadHacker() {
-    if (!window) return
-    if (window.performance.navigation.type === window.performance.navigation.TYPE_RELOAD) {
-        // 用户进行了刷新动作
-        try {
-            let accessRoutes = userStore.getAuthority || {}
-            const menuNames = accessRoutes?.menuNames
-            if (Array.isArray(menuNames) && accessRoutes?.menuNames?.length === 0) {
-                accessRoutes = await userStore.GetAuthority()
-                const asyncRoutes = globalState.getState('asyncRoutes');
-                const basicRoutes = globalState.getState('basicRoutes');
-                routeStore.GenerateRoutes(accessRoutes?.menuNames || [], asyncRoutes, basicRoutes)
+export async function reloadHacker(): Promise<void> {
+    // 检查 window 对象是否存在，如果不存在则直接返回
+    if (typeof window === 'undefined') {
+        return;
+    }
+
+    // 检查浏览器是否支持 PerformanceNavigationTiming 接口
+    if ('PerformanceNavigationTiming' in window) {
+        // 获取所有类型为 'navigation' 的性能条目
+        const navigationEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+
+        // 通常情况下，数组中的第一个元素就是当前页面的导航性能条目
+        const navigationEntry = navigationEntries[0];
+
+        if (navigationEntry) {
+            // 获取导航类型
+            const navigationType = navigationEntry.type;
+
+            // 检查导航类型是否为重新加载或正常导航
+            if (navigationType === 'reload' || navigationType === 'navigate') {
+                // 调用自定义函数
+                userTriggerOverload();
             }
-            const domain = globalState.getState('domain');
-            // 兼容oa 系统单点登录，获取 oa 中的 token
-            const { ossToken } = getSSOToken(domain)
-            if (!toGetToken() && !ossToken) {
-                return userStore.Logout()
-            }
-        } catch (err) {
-            return userStore.Logout()
         }
+    } else {
+        console.log('浏览器不支持 PerformanceNavigationTiming 接口');
     }
 }
 
+const userTriggerOverload=async()=>{
+    // 用户进行了刷新动作
+    try {
+        let accessRoutes = userStore.getAuthority || {}
+        const menuNames = accessRoutes?.menuNames
+        if (Array.isArray(menuNames) && accessRoutes?.menuNames?.length === 0) {
+            accessRoutes = await userStore.GetAuthority()
+            const asyncRoutes = globalState.getState('asyncRoutes');
+            const basicRoutes = globalState.getState('basicRoutes');
+            routeStore.GenerateRoutes(accessRoutes?.menuNames || [], asyncRoutes, basicRoutes)
+        }
+        const domain = globalState.getState('domain');
+        // 兼容oa 系统单点登录，获取 oa 中的 token
+        const { ossToken } = getSSOToken(domain)
+        if (!toGetToken() && !ossToken) {
+            return userStore.Logout()
+        }
+    } catch (err) {
+        return userStore.Logout()
+    }
+}
